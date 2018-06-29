@@ -11,6 +11,11 @@ const baseHref = `file://${__dirname}/`;
 const homeHref = path.join(baseHref, '..', '__mock-home');
 const baseWoolHref = path.join(homeHref, '.wool', 'packages');
 
+const TRACE = process.argv.includes('--wool-trace');
+const trace = (...args) => {
+  if (TRACE) console.log('wool:trace --', ...args);
+};
+
 const readPackageConfig = async url => {
   try {
     return JSON.parse(
@@ -23,6 +28,8 @@ const readPackageConfig = async url => {
 };
 
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
+  trace(specifier);
+
   // If this is a file path, use the default resolver
   if (specifier.startsWith('/') || specifier.startsWith('.')) {
     return defaultResolver(specifier, parentModuleUrl);
@@ -45,6 +52,7 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   try {
     const config = await readPackageConfig(specifierHref);
     const url = new URL(path.join(specifierHref, config.entry)).href;
+    trace(url);
     return {
       url,
       // parentModuleUrl: parentModuleUrl || url,
