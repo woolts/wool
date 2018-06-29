@@ -23,16 +23,24 @@ const readPackageConfig = async url => {
 };
 
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
-  console.log({ parentModuleUrl });
-
   // If this is a file path, use the default resolver
   if (specifier.startsWith('/') || specifier.startsWith('.')) {
     return defaultResolver(specifier, parentModuleUrl);
   }
 
+  let entryConfig;
+  if (parentModuleUrl) {
+    entryConfig = await readPackageConfig(path.dirname(parentModuleUrl));
+  }
+
+  const specifierHref = path.join(
+    baseWoolHref,
+    specifier,
+    entryConfig.dependencies[specifier].version,
+  );
+
   // Try wool package resolution
   try {
-    const specifierHref = path.join(baseWoolHref, specifier);
     const config = await readPackageConfig(specifierHref);
     const url = new URL(path.join(specifierHref, config.entry)).href;
     return {
@@ -41,6 +49,9 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
       format: 'esm',
     };
   } catch (err) {
+    console.log(
+      `\nCould not find wool module\n\n    ${specifier}\n    ${specifierHref}\n\n`,
+    );
     // Otherwise use default resolver
     return defaultResolver(specifier, parentModuleUrl);
   }
