@@ -1,0 +1,8 @@
+# Editors
+.vscode
+
+# System
+.DS_Store
+
+# Temp
+_old
