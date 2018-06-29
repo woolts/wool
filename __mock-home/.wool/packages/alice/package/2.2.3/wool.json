@@ -1,0 +1,6 @@
+{
+  "name": "alice/package",
+  "version": "2.2.3",
+  "entry": "alice.mjs",
+  "dependencies": {}
+}

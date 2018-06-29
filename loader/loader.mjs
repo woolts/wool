@@ -29,8 +29,10 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   }
 
   let entryConfig;
-  if (parentModuleUrl) {
-    entryConfig = await readPackageConfig(path.dirname(parentModuleUrl));
+  if (process.env.WOOL_ENTRY) {
+    entryConfig = await readPackageConfig(
+      `file://${path.dirname(path.join(cwd, process.env.WOOL_ENTRY))}`,
+    );
   }
 
   const specifierHref = path.join(
@@ -45,13 +47,14 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
     const url = new URL(path.join(specifierHref, config.entry)).href;
     return {
       url,
-      parentModuleUrl: parentModuleUrl || url,
+      // parentModuleUrl: parentModuleUrl || url,
       format: 'esm',
     };
   } catch (err) {
     console.log(
       `\nCould not find wool module\n\n    ${specifier}\n    ${specifierHref}\n\n`,
     );
+
     // Otherwise use default resolver
     return defaultResolver(specifier, parentModuleUrl);
   }
