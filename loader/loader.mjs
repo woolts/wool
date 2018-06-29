@@ -3,6 +3,7 @@ import path from 'path';
 import { URL } from 'url';
 import util from 'util';
 
+import cwd from './cwd';
 import __dirname from './dirname';
 
 const baseHref = `file://${__dirname}/`;
@@ -22,6 +23,8 @@ const readPackageConfig = async url => {
 };
 
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
+  console.log({ parentModuleUrl });
+
   // If this is a file path, use the default resolver
   if (specifier.startsWith('/') || specifier.startsWith('.')) {
     return defaultResolver(specifier, parentModuleUrl);
@@ -29,11 +32,12 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
 
   // Try wool package resolution
   try {
-    const specifier = path.join(baseWoolHref, specifier);
+    const specifierHref = path.join(baseWoolHref, specifier);
     const config = await readPackageConfig(specifierHref);
     const url = new URL(path.join(specifierHref, config.entry)).href;
     return {
       url,
+      parentModuleUrl: parentModuleUrl || url,
       format: 'esm',
     };
   } catch (err) {
