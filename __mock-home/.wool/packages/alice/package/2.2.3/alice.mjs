@@ -1,5 +1,3 @@
-console.log('alice/package', '2.2.3');
-
-export default () => {
-  console.log('alice/package', '2.2.3', '--', 'inside');
+export default msg => {
+  return `alice/package\n${msg}`;
 };

@@ -16,6 +16,8 @@ const trace = (...args) => {
   if (TRACE) console.log('wool:trace --', ...args);
 };
 
+const resolved = {};
+
 const readPackageConfig = async url => {
   try {
     return JSON.parse(
@@ -35,6 +37,14 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
     return defaultResolver(specifier, parentModuleUrl);
   }
 
+  if (resolved[specifier]) {
+    trace(specifier, '|', 'from cache');
+    return {
+      url: resolved[specifier],
+      format: 'esm',
+    };
+  }
+
   let entryConfig;
   if (process.env.WOOL_ENTRY) {
     entryConfig = await readPackageConfig(
@@ -52,7 +62,8 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   try {
     const config = await readPackageConfig(specifierHref);
     const url = new URL(path.join(specifierHref, config.entry)).href;
-    trace(url);
+    trace(specifier, '|', url.replace(new URL(homeHref).href, '$HOME'));
+    resolved[specifier] = url;
     return {
       url,
       // parentModuleUrl: parentModuleUrl || url,
