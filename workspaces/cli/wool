@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-WOOL_PATH=$PWD/__mock-home/.wool \
+WOOL_PATH=$PWD/__mock-home/.wool/ \
 WOOL_ENTRY=$1 \
 node --experimental-modules --loader $PWD/workspaces/loader/src/loader.mjs $@

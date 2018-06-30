@@ -1,5 +1,8 @@
 {
   "private": true,
+  "registries": [
+    "http://localhost:8080"
+  ],
   "workspaces": [
     "workspaces/cli",
     "workspaces/loader",

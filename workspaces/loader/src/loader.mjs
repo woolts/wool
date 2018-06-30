@@ -44,8 +44,12 @@ const readPackageLock = async url => {
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   trace(specifier);
 
-  // If this is a file path, use the default resolver
-  if (specifier.startsWith('/') || specifier.startsWith('.')) {
+  // If this is a file path or non-namespaced specifier, use the default resolver
+  if (
+    specifier.startsWith('/') ||
+    specifier.startsWith('.') ||
+    !specifier.includes('/')
+  ) {
     return defaultResolver(specifier, parentModuleUrl);
   }
 
@@ -59,12 +63,19 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
 
   let entryConfig;
   let entryLock;
-  if (process.env.WOOL_ENTRY) {
-    const entryDir = `file://${path.dirname(
-      path.join(cwd, process.env.WOOL_ENTRY),
-    )}`;
-    entryConfig = await readPackageConfig(entryDir);
-    entryLock = await readPackageLock(entryDir);
+  let entryDir = path.join(cwd, process.env.WOOL_ENTRY);
+  let found = false;
+  while (!found && entryDir !== '/') {
+    entryDir = path.dirname(entryDir);
+    const entryDirHref = `file://${entryDir}`;
+    console.log(entryDirHref);
+    try {
+      entryConfig = await readPackageConfig(entryDirHref);
+      entryLock = await readPackageLock(entryDirHref);
+      found = true;
+    } catch (err) {
+      // ...
+    }
   }
 
   const specifierHref = new URL(
