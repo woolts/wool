@@ -68,7 +68,6 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   while (!found && entryDir !== '/') {
     entryDir = path.dirname(entryDir);
     const entryDirHref = `file://${entryDir}`;
-    console.log(entryDirHref);
     try {
       entryConfig = await readPackageConfig(entryDirHref);
       entryLock = await readPackageLock(entryDirHref);
