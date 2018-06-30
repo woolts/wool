@@ -1,0 +1,12 @@
+{
+  "alice/package": {
+    "versions": [
+      "2.2.3"
+    ]
+  },
+  "lsjroberts/other": {
+    "versions": [
+      "1.0.13"
+    ]
+  }
+}

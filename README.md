@@ -11,5 +11,5 @@ See http://gelatindesign.co.uk/coding/javascript-ecosystem
 ### Registry
 
 ```
-./workspaces/cli/wool workspaces/registry/server/src/index.mjs
+./workspaces/cli/wool workspaces/registry/server/src/index.mjs example
 ```

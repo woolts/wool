@@ -14,7 +14,7 @@ export function list() {
 }
 
 export function count() {
-  return packages.length;
+  return Object.keys(packages).length;
 }
 
 export async function refresh(dir) {
