@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
-WOOL_PATH=$PWD/__mock-home/.wool/ \
-WOOL_ENTRY=$1 \
-node --experimental-modules --loader $PWD/workspaces/loader/src/loader.mjs $@
+dir=$(dirname "$0")
+
+run_node() {
+  # TODO: take WOOL_PATH from env
+  WOOL_PATH=$PWD/__mock-home/.wool/ \
+  WOOL_ENTRY=$1 \
+  node --experimental-modules --no-warnings --loader $PWD/workspaces/loader/src/loader.mjs $*
+}
+
+if [[ $1 == *.mjs ]]
+then
+  run_node $1
+else
+  run_node "${dir}/src/cli.mjs" $*
+fi

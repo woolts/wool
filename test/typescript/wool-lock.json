@@ -1,0 +1,12 @@
+{
+  "alice/package": {
+    "version": "2.2.3",
+    "range": "2.2.0 <= v < 3.0.0",
+    "registry": "http://localhost:8080"
+  },
+  "lsjroberts/other": {
+    "version": "1.0.13",
+    "range": "1.0.0 <= v < 2.0.0",
+    "registry": "http://localhost:8080"
+  }
+}

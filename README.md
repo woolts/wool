@@ -5,7 +5,8 @@ See http://gelatindesign.co.uk/coding/javascript-ecosystem
 ## Test
 
 ```
-./workspaces/cli/wool test/example.mjs
+./workspaces/cli/wool test/basic/example.mjs
+./workspaces/cli/wool test/typescript/example.ts
 ```
 
 ### Registry

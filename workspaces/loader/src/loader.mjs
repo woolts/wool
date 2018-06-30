@@ -10,6 +10,8 @@ const baseHref = `file://${__dirname}/`;
 const woolHref = `file://${process.env.WOOL_PATH}`;
 const woolPackagesHref = `${woolHref}/packages`;
 
+const entryUrl = new URL(process.env.WOOL_ENTRY, new URL(`file://${cwd}`));
+
 const TRACE = process.argv.includes('--wool-trace');
 const trace = (...args) => {
   if (TRACE) console.log('wool:trace --', ...args);
@@ -44,12 +46,23 @@ const readPackageLock = async url => {
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   trace(specifier);
 
-  // If this is a file path or non-namespaced specifier, use the default resolver
+  // If this is a file path or non-namespaced specifier
   if (
     specifier.startsWith('/') ||
     specifier.startsWith('.') ||
     !specifier.includes('/')
   ) {
+    const resolvedSpecifierUrl = new URL(
+      specifier,
+      parentModuleUrl || entryUrl,
+    );
+
+    // Check if it is a typescript file
+    if (resolvedSpecifierUrl.href.endsWith('.ts')) {
+      throw new Error('Can not handle typescript at the moment');
+    }
+
+    // Otherwise, use the default resolver
     return defaultResolver(specifier, parentModuleUrl);
   }
 
