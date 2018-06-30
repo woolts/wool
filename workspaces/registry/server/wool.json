@@ -1,0 +1,4 @@
+{
+  "name": "wool/registry-server",
+  "entry": "src/index.mjs"
+}

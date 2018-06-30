@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": [
+    "workspaces/cli",
+    "workspaces/loader",
+    "workspaces/registry"
+  ]
+}
