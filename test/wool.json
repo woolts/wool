@@ -4,13 +4,7 @@
   "nodeVersion": "10.5.0 <= v < 11.0.0",
   "entry": "example.mjs",
   "dependencies": {
-    "alice/package": {
-      "version": "2.2.3",
-      "range": "2.2.0 <= v < 3.0.0"
-    },
-    "lsjroberts/other": {
-      "version": "1.0.13",
-      "range": "1.0.0 <= v < 2.0.0"
-    }
+    "alice/package": "2.2.0 <= v < 3.0.0",
+    "lsjroberts/other": "1.0.0 <= v < 2.0.0"
   }
 }
