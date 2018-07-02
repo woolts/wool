@@ -4,9 +4,10 @@ dir=$(dirname "$0")
 
 run_node() {
   # TODO: take WOOL_PATH from env
+  # TODO: get the loader path relative to WOOL_PATH from env
   WOOL_PATH=$PWD/__mock-home/.wool/ \
   WOOL_ENTRY=$1 \
-  node --experimental-modules --no-warnings --loader $PWD/workspaces/loader/src/loader.mjs $*
+  node --experimental-modules --loader $PWD/workspaces/loader/src/loader.mjs $*
 }
 
 if [[ $1 == *.mjs ]]

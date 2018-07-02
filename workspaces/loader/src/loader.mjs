@@ -4,9 +4,7 @@ import { URL } from 'url';
 import util from 'util';
 
 import cwd from './cwd';
-import __dirname from './dirname';
 
-const baseHref = `file://${__dirname}/`;
 const woolHref = `file://${process.env.WOOL_PATH}`;
 const woolPackagesHref = `${woolHref}/packages`;
 
@@ -74,7 +72,6 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
     };
   }
 
-  let entryConfig;
   let entryLock;
   let entryDir = path.join(cwd, process.env.WOOL_ENTRY);
   let found = false;
@@ -82,7 +79,6 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
     entryDir = path.dirname(entryDir);
     const entryDirHref = `file://${entryDir}`;
     try {
-      entryConfig = await readPackageConfig(entryDirHref);
       entryLock = await readPackageLock(entryDirHref);
       found = true;
     } catch (err) {
@@ -90,9 +86,17 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
     }
   }
 
-  const specifierHref = new URL(
-    path.join(woolPackagesHref, specifier, entryLock[specifier].version),
-  ).href;
+  let specifierHref;
+
+  if (entryLock[specifier].workspace) {
+    specifierHref = new URL(
+      `file://${path.join(cwd, entryLock[specifier].workspace)}`,
+    ).href;
+  } else {
+    specifierHref = new URL(
+      path.join(woolPackagesHref, specifier, entryLock[specifier].version),
+    ).href;
+  }
 
   // Try wool package resolution
   try {

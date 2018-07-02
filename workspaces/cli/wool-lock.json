@@ -1,0 +1,8 @@
+{
+  "wool/inquirer": {
+    "workspace": "workspaces/inquirer"
+  },
+  "wool/semver": {
+    "workspace": "workspaces/semver"
+  }
+}
