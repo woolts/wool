@@ -16,6 +16,3 @@ mkdir -p $WOOL_PATH/.bin
 
 cd $WOOL_PATH/.bin
 ln -s ../packages/wool/cli/0.0.0/bin/wool .
-
-# cd $WOOL_PATH/packages/wool/cli/0.0.0/bin
-# ln -s ../../../../../.bin ./wool
