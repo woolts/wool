@@ -1,0 +1,10 @@
+{
+  "name": "lsjroberts/basic",
+  "version": "0.1.0",
+  "nodeVersion": "10.5.0 <= v < 11.0.0",
+  "entry": "basic.mjs",
+  "dependencies": {
+    "alice/package": "2.2.0 <= v < 3.0.0",
+    "lsjroberts/other": "1.0.0 <= v < 2.0.0"
+  }
+}

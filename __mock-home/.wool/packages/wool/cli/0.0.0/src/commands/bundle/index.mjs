@@ -2,12 +2,12 @@ import action from './bundle.mjs';
 
 export default {
   name: 'bundle',
-  aliases: ['b'],
+  alias: 'b',
   arguments: '[path]',
   options: [
     {
       name: 'version',
-      aliases: 'v',
+      alias: 'v',
     },
   ],
   action,

@@ -3,12 +3,12 @@ import action from './add';
 export default {
   name: 'add',
   action,
-  aliases: 'a',
+  alias: 'a',
   arguments: '<name>',
   options: [
     {
       name: 'global',
-      aliases: ['g'],
+      alias: 'g',
       description: "Add the package's binaries to your global path",
     },
   ],

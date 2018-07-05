@@ -10,7 +10,7 @@ export default function run(app, args) {
     return;
   }
 
-  if (found && rest.includes('--help')) {
+  if (found && (command === 'help' || rest.includes('--help'))) {
     helpCommand(app, found);
     return Promise.resolve();
   }
@@ -77,13 +77,25 @@ function matchArguments(expectedString, actual) {
   return matched;
 }
 
-function matchOptions(expected, actual) {
+function matchOptions(expectedArray, actual) {
   // TODO: filter against expected
+  if (expectedArray.length === 0) return {};
 
   // if (!expectedString) return {};
 
-  // const expectedArray = expectedString.split(' ');
   const matched = {};
+  const expected = {};
+  const expectedAliases = {};
+
+  expectedArray.forEach(e => {
+    expected[e.name] = e;
+    expectedAliases[e.alias] = e.name;
+    if (e.type === 'boolean') {
+      matched[e.name] = false;
+    }
+  });
+
+  // TODO: default boolean flags to false
 
   // TODO: functional
   for (let index = 0; index < actual.length; index++) {
@@ -91,7 +103,18 @@ function matchOptions(expected, actual) {
     if (!isOption(value)) {
       continue;
     }
-    matched[value.replace(/^--?/, '')] = actual[index + 1];
+
+    let name = value.replace(/^--?/, '');
+    if (!expected[name] && expectedAliases[name]) {
+      name = expectedAliases[name];
+    }
+
+    if (expected[name] && expected[name].type === 'boolean') {
+      matched[name] = true;
+      continue;
+    }
+
+    matched[name] = actual[index + 1];
     index += 1;
   }
 
@@ -107,7 +130,7 @@ function isOptional(arg) {
 }
 
 function isOption(option) {
-  return option.startsWith('--') || option.startsWith('-');
+  return option && (option.startsWith('--') || option.startsWith('-'));
 }
 
 /*

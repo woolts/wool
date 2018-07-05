@@ -106,7 +106,7 @@ wool publish --version 1.1.0
 
 Bundles the package then publishes it to each listed registry that is compatible.
 
-**Publish a package only locally to the `~/.wool` directory** (todo)
+**Publish a package only locally to the `~/.wool` directory** (wip)
 
 ```
 wool local?

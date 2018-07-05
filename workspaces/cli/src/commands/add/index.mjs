@@ -3,7 +3,7 @@ import action from './add';
 export default {
   name: 'add',
   action,
-  aliases: 'a',
+  alias: 'a',
   arguments: '<name>',
   options: [
     {

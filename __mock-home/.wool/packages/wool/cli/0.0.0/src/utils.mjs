@@ -10,8 +10,8 @@ export const localPackagesPath = path.join(woolPath, 'packages');
 export const woolUrl = new URL(`file://${process.env.WOOL_PATH}`);
 export const localPackagesUrl = new URL('./packages/', woolUrl);
 
-const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
-const urlToPath = u => u.href.replace('file://', '');
+export const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
+export const urlToPath = u => u.href.replace('file://', '');
 
 export const readPackageConfig = async url =>
   JSON.parse(await readFile(new URL('wool.json', url)));
