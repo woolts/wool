@@ -1,6 +1,6 @@
 import path from 'path';
 
-export default function run(app, args) {
+export default async function run(app, args) {
   const [command, ...rest] = args;
 
   const found = app.commands.filter(c => c.name === command)[0];
@@ -18,7 +18,7 @@ export default function run(app, args) {
   const namedArguments = matchArguments(found.arguments, rest);
   const options = matchOptions(found.options, rest);
 
-  return found.action({ args: namedArguments, options });
+  return await found.action({ args: namedArguments, options });
 }
 
 function help(app) {
@@ -79,7 +79,7 @@ function matchArguments(expectedString, actual) {
 
 function matchOptions(expectedArray, actual) {
   // TODO: filter against expected
-  if (expectedArray.length === 0) return {};
+  if (!expectedArray || expectedArray.length === 0) return {};
 
   // if (!expectedString) return {};
 

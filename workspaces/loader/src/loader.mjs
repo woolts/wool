@@ -77,7 +77,7 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   let searchDirs = [];
   while (!found && searchDir !== '/') {
     searchDir = path.dirname(searchDir);
-    const searchDirUrl = new URL(`file://${searchDir}`);
+    const searchDirUrl = new URL(`file://${searchDir}/`);
     searchDirs.push(searchDirUrl);
     try {
       entryLock = await readPackageLock(searchDirUrl);
