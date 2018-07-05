@@ -77,7 +77,7 @@ ls ~/.wool/.bin/example
 wool link .
 ``` -->
 
-**Version a package** (todo)
+**Version a package** (wip)
 
 ```
 wool version [version]

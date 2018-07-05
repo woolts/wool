@@ -14,6 +14,6 @@ const app = {
 };
 
 run(app, process.argv.slice(2)).catch(err => {
-  console.error(err.message ? err.message : err);
+  console.error(err);
   process.exitCode = 1;
 });
