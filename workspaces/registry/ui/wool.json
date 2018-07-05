@@ -1,5 +1,4 @@
 {
   "name": "wool/registry-ui",
-  "version": "0.0.0",
   "entry": "src/index.mjs"
 }

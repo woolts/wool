@@ -1,4 +1,5 @@
 import path from 'path';
+import * as colors from 'wool/cli-colors';
 import { exec } from 'wool/process';
 import {
   localPackagesPath,
@@ -23,16 +24,18 @@ export default async function local({ args, options }) {
   } else {
     const workspaces = await resolveWorkspaces(process.cwd());
     for (let workspace in workspaces) {
-      await installPackage(workspaces[workspace].dir);
+      await installPackage(
+        workspaces[workspace].dir,
+        workspaces[workspace].version,
+      );
     }
   }
 }
 
-async function installPackage(dir) {
+async function installPackage(dir, maybeVersion) {
   const config = await readPackageConfig(pathToUrl(dir));
-  const targetDir = path.join(localPackagesPath, config.name, config.version);
-
-  console.log(`Installing ${config.name} into ${targetDir}`);
+  const version = config.version || maybeVersion;
+  const targetDir = path.join(localPackagesPath, config.name, version);
 
   if (
     targetDir === '' ||
@@ -45,4 +48,8 @@ async function installPackage(dir) {
   await exec(`rm -rf ${targetDir}`);
   await exec(`mkdir -p ${targetDir}`);
   await exec(`cp -R ${dir}/* ${targetDir}`);
+
+  console.log(
+    `Installed ${colors.cyan(config.name)} at ${colors.blue(version)}`,
+  );
 }

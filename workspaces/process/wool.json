@@ -1,6 +1,5 @@
 {
   "name": "wool/process",
-  "version": "0.0.0",
   "entry": "src/index.mjs",
   "registries": [],
   "dependencies": {}

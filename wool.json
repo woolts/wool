@@ -1,11 +1,13 @@
 {
   "private": true,
+  "version": "0.0.0",
   "registries": [
     "http://localhost:8080"
   ],
   "workspaces": [
     "workspaces/cli",
     "workspaces/cli-args",
+    "workspaces/cli-colors",
     "workspaces/cli-questions",
     "workspaces/loader",
     "workspaces/process",

@@ -1,0 +1,5 @@
+{
+  "name": "wool/cli-colors",
+  "entry": "index.mjs",
+  "dependencies": {}
+}

@@ -1,12 +1,12 @@
 {
   "name": "wool/cli",
-  "version": "0.0.0",
   "entry": "src/cli.mjs",
   "bin": {
     "wool": "bin/wool"
   },
   "dependencies": {
     "wool/cli-args": "0.0.0 <= v < 1.0.0",
+    "wool/cli-colors": "0.0.0 <= v < 1.0.0",
     "wool/cli-questions": "0.0.0 <= v < 1.0.0",
     "wool/process": "0.0.0 <= v < 1.0.0",
     "wool/semver": "0.0.0 <= v < 1.0.0",

@@ -45,15 +45,21 @@ export async function resolveWorkspaces(dir, version) {
   let resolvedWorkspaces = {};
 
   if (!config.workspaces) {
+    if (!config.name) {
+      throw new Error(
+        'Cannot install a package that does not have a name or any workspaces.',
+      );
+    }
+
     return {
-      [config.name || '_']: { dir, version: config.version || version },
+      [config.name]: { dir, version: config.version || version },
     };
   }
 
   for (let i = 0; i < config.workspaces.length; i++) {
     const ws = await resolveWorkspaces(
       path.join(dir, config.workspaces[i]),
-      config.version,
+      config.version || version,
     );
     resolvedWorkspaces = {
       ...resolvedWorkspaces,
