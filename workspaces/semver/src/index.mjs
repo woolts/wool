@@ -41,9 +41,24 @@ export function satisfies(constraint, version) {
 }
 
 // Version
-export function increment(version, level = PATCH) {}
+export function increment(version, level = PATCH) {
+  const v = splitVersion(version);
+
+  if (level === MAJOR) {
+    return `${v.major + 1}.0.0`;
+  }
+
+  if (level === MINOR) {
+    return `${v.major}.${v.minor + 1}.0`;
+  }
+
+  return `${v.major}.${v.minor}.${v.patch + 1}`;
+}
 
 export function splitVersion(version) {
+  if (typeof version !== 'string') {
+    throw new Error(`Cannot split version as it is not a string: ${version}`);
+  }
   const [major, minor, patch] = version.split('.');
   return {
     major: parseInt(major, 10),
@@ -75,7 +90,7 @@ export function compareVersions(version, withVersion) {
   const v = splitVersion(version);
   const w = splitVersion(withVersion);
 
-  if (v.major === w.major && v.minor === w.major && v.patch === w.patch) {
+  if (v.major === w.major && v.minor === w.minor && v.patch === w.patch) {
     return 0;
   }
 

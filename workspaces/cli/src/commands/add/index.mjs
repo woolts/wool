@@ -8,7 +8,7 @@ export default {
   options: [
     {
       name: 'global',
-      aliases: ['g'],
+      alias: 'g',
       description: "Add the package's binaries to your global path",
     },
   ],

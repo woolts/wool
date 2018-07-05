@@ -10,29 +10,29 @@ export const localPackagesPath = path.join(woolPath, 'packages');
 export const woolUrl = new URL(`file://${process.env.WOOL_PATH}`);
 export const localPackagesUrl = new URL('./packages/', woolUrl);
 
-const pathToUrl = p => new URL(`file://${path.resolve(p)}`);
-const urlToPath = u => u.href.replace('file://', '');
+export const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
+export const urlToPath = u => u.href.replace('file://', '');
 
-export const readPackageConfig = async url => {
-  try {
-    return JSON.parse(await readFile(new URL('wool.json', url)));
-  } catch (err) {
-    // if (err.code !== 'ENOENT')
-    throw err;
-  }
-};
+export const readPackageConfig = async url =>
+  JSON.parse(await readFile(new URL('wool.json', url)));
 
-export const writePackageConfig = async (url, config) => {
-  try {
-    await writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
-  } catch (err) {
-    // if (err.code !== 'ENOENT')
-    throw err;
-  }
-};
+export const readPackageVersionLock = async url =>
+  JSON.parse(await readFile(new URL('wool.version', url)));
+
+export const writePackageConfig = (url, config) =>
+  writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
+
+export const writePackageVersionLock = (url, config) =>
+  writeFile(new URL('wool.version', url), JSON.stringify(config, null, 2));
 
 export const readActivePackageConfig = () =>
   readPackageConfig(pathToUrl(process.cwd()));
 
+export const readActivePackageVersionLock = () =>
+  readPackageVersionLock(pathToUrl(process.cwd()));
+
 export const writeActivePackageConfig = config =>
-  readPackageConfig(pathToUrl(process.cwd()), config);
+  writePackageConfig(pathToUrl(process.cwd()), config);
+
+export const writeActivePackageVersionLock = config =>
+  writePackageVersionLock(pathToUrl(process.cwd()), config);

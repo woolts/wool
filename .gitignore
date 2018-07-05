@@ -5,4 +5,5 @@
 .DS_Store
 
 # Temp
+__mock-home
 _old

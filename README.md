@@ -2,15 +2,19 @@
 
 See http://gelatindesign.co.uk/coding/javascript-ecosystem
 
-## Test
+## Getting Started
+
+1.  Add `export WOOL_PATH=$HOME/.wool` to your profile
+2.  Add `PATH="$PATH:$WOOL_PATH/.bin"` to your profile
+3.  Run the installation script:
 
 ```
-./workspaces/cli/wool test/basic/example.mjs
-./workspaces/cli/wool test/typescript/example.ts
+./scripts/install.sh
 ```
 
-### Registry
+## Example
 
 ```
-./workspaces/cli/wool workspaces/registry/server/src/index.mjs example
+cd test/basic
+wool .
 ```

@@ -10,39 +10,15 @@ export default function run(app, args) {
     return;
   }
 
-  if (found && args.includes('--help')) {
+  if (found && (command === 'help' || rest.includes('--help'))) {
     helpCommand(app, found);
     return Promise.resolve();
   }
 
-  const namedArguments = {};
-  if (found.arguments) {
-    const argumentsArray = found.arguments.split(' ');
+  const namedArguments = matchArguments(found.arguments, rest);
+  const options = matchOptions(found.options, rest);
 
-    argumentsArray.forEach((a, index) => {
-      const name = a
-        .split('')
-        .slice(1, -1)
-        .join('');
-
-      if (a[0] === '[' && a[a.length - 1] === ']') {
-        namedArguments[name] = rest[index];
-        return;
-      }
-
-      if (a[0] === '<' && a[a.length - 1] === '>') {
-        if (arguments[index] === undefined) {
-          throw new Error('shit it');
-        }
-        namedArguments[name] = rest[index];
-        return;
-      }
-
-      throw new Error('fuck it');
-    });
-  }
-
-  return found.action({ arguments: namedArguments });
+  return found.action({ args: namedArguments, options });
 }
 
 function help(app) {
@@ -62,6 +38,99 @@ function helpCommand(app, command) {
   command.options.forEach(option => {
     console.log(`    --${option.name}  ${option.description}`);
   });
+}
+
+function matchArguments(expectedString, actual) {
+  if (!expectedString) return {};
+
+  const expectedArray = expectedString.split(' ');
+  const matched = {};
+
+  expectedArray.forEach((expected, index) => {
+    const name = expected
+      .split('')
+      .slice(1, -1)
+      .join('');
+
+    if (isRequired(expected)) {
+      if (actual[index] === undefined) {
+        throw new Error(`Required argument ${name} was not provided`);
+      }
+      if (isOption(actual[index])) {
+        throw new Error(`Arguments must be provided before optional flags`);
+      }
+      matched[name] = actual[index];
+      return;
+    }
+
+    if (isOptional(expected)) {
+      if (!isOption(actual[index])) {
+        matched[name] = actual[index];
+      }
+      return;
+    }
+
+    // TODO: This should error earlier
+    throw new Error(`Argument definition is invalid: ${expected}`);
+  });
+
+  return matched;
+}
+
+function matchOptions(expectedArray, actual) {
+  // TODO: filter against expected
+  if (expectedArray.length === 0) return {};
+
+  // if (!expectedString) return {};
+
+  const matched = {};
+  const expected = {};
+  const expectedAliases = {};
+
+  expectedArray.forEach(e => {
+    expected[e.name] = e;
+    expectedAliases[e.alias] = e.name;
+    if (e.type === 'boolean') {
+      matched[e.name] = false;
+    }
+  });
+
+  // TODO: default boolean flags to false
+
+  // TODO: functional
+  for (let index = 0; index < actual.length; index++) {
+    const value = actual[index];
+    if (!isOption(value)) {
+      continue;
+    }
+
+    let name = value.replace(/^--?/, '');
+    if (!expected[name] && expectedAliases[name]) {
+      name = expectedAliases[name];
+    }
+
+    if (expected[name] && expected[name].type === 'boolean') {
+      matched[name] = true;
+      continue;
+    }
+
+    matched[name] = actual[index + 1];
+    index += 1;
+  }
+
+  return matched;
+}
+
+function isRequired(arg) {
+  return arg[0] === '<' && arg[arg.length - 1] === '>';
+}
+
+function isOptional(arg) {
+  return arg[0] === '[' && arg[arg.length - 1] === ']';
+}
+
+function isOption(option) {
+  return option && (option.startsWith('--') || option.startsWith('-'));
 }
 
 /*

@@ -6,9 +6,9 @@
     "wool": "bin/wool"
   },
   "dependencies": {
-    "wool/cli-args": ":workspace",
-    "wool/cli-questions": ":workspace",
-    "wool/process": ":workspace",
-    "wool/semver": ":workspace"
+    "wool/cli-args": "0.0.0 <= v < 1.0.0",
+    "wool/cli-questions": "0.0.0 <= v < 1.0.0",
+    "wool/process": "0.0.0 <= v < 1.0.0",
+    "wool/semver": "0.0.0 <= v < 1.0.0"
   }
 }
