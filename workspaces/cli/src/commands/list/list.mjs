@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
-import { localPackagesPath } from '../../utils';
+import { localPackagesPath } from 'wool/utils';
 
 export default async function run() {
   const namespaces = fs.readdirSync(localPackagesPath);

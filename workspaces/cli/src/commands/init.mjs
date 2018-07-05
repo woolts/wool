@@ -1,6 +1,5 @@
 import path from 'path';
-
-import { readPackageConfig, writePackageConfig, woolUrl } from '../utils';
+import { readPackageConfig, writePackageConfig, woolUrl } from 'wool/utils';
 
 export default async function init() {
   const globalConfig = await readPackageConfig(woolUrl);

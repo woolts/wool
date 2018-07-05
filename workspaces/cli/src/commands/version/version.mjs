@@ -1,12 +1,11 @@
 import path from 'path';
 import * as semver from 'wool/semver';
-
 import {
   readActivePackageConfig,
   readActivePackageVersionLock,
   writeActivePackageConfig,
   writeActivePackageVersionLock,
-} from '../../utils';
+} from 'wool/utils';
 
 export default async function run({ args }) {
   const config = await readActivePackageConfig();

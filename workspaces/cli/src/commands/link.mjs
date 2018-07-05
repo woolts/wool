@@ -1,7 +1,6 @@
 import path from 'path';
 import { exec } from 'wool/process';
-
-import { localPackagesPath, readPackageConfig, woolPath } from '../utils';
+import { localPackagesPath, readPackageConfig, woolPath } from 'wool/utils';
 
 export default async function link(dir) {
   const resolvedDir = new URL(`file://${path.resolve(process.cwd(), dir)}/`);

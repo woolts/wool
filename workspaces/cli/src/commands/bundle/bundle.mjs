@@ -1,4 +1,4 @@
-import { readActivePackageConfig } from '../../utils';
+import { readActivePackageConfig } from 'wool/utils';
 
 export default async function run({ args, options }) {
   console.log({ args, options });

@@ -3,12 +3,11 @@ import path from 'path';
 import util from 'util';
 import * as cliQuestions from 'wool/cli-questions';
 import * as semver from 'wool/semver';
-
 import {
   localPackagesUrl,
   readPackageConfig,
   writePackageConfig,
-} from '../../utils';
+} from 'wool/utils';
 
 const isValidName = specifier => {
   // https://regex101.com/r/s7UWNw/1
