@@ -5,7 +5,12 @@
   ],
   "workspaces": [
     "workspaces/cli",
+    "workspaces/cli-args",
+    "workspaces/cli-questions",
     "workspaces/loader",
-    "workspaces/registry"
+    "workspaces/process",
+    "workspaces/registry",
+    "workspaces/semver",
+    "workspaces/utils"
   ]
 }

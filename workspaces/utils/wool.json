@@ -1,0 +1,6 @@
+{
+  "name": "wool/utils",
+  "version": "0.0.0",
+  "entry": "src/index.mjs",
+  "dependencies": {}
+}

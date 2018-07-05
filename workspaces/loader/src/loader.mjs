@@ -83,6 +83,7 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
       entryLock = await readPackageLock(searchDirUrl);
       found = true;
     } catch (err) {
+      // console.log(err);
       // throw err;
     }
   }

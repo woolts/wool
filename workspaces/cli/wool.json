@@ -9,6 +9,7 @@
     "wool/cli-args": "0.0.0 <= v < 1.0.0",
     "wool/cli-questions": "0.0.0 <= v < 1.0.0",
     "wool/process": "0.0.0 <= v < 1.0.0",
-    "wool/semver": "0.0.0 <= v < 1.0.0"
+    "wool/semver": "0.0.0 <= v < 1.0.0",
+    "wool/utils": "0.0.0 <= v < 1.0.0"
   }
 }
