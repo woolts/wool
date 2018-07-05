@@ -18,9 +18,25 @@ To uninstall use:
 ./scripts/uninstall.sh
 ```
 
+To test it is working, run:
+
+```
+wool list
+```
+
+And you should see a list of the installed `wool/*` packages.
+
 ## Example
 
 ```
-cd test/basic
-wool .
+cd examples/alice/package
+wool local
+cd ../../bob/package
+wool local
+cd ../../lsjroberts/example
+wool index.mjs
+```
+
+```
+bob/package -- alice/package -- lsjroberts/example
 ```
