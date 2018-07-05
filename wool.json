@@ -13,6 +13,9 @@
     "workspaces/process",
     "workspaces/registry",
     "workspaces/semver",
-    "workspaces/utils"
+    "workspaces/utils",
+    "examples/alice/package",
+    "examples/bob/package",
+    "examples/lsjroberts/example"
   ]
 }

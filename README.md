@@ -30,12 +30,9 @@ And you should see a list of the installed `wool/*` packages.
 ## Example
 
 ```
-cd examples/alice/package
 wool local
-cd ../../bob/package
-wool local
-cd ../../lsjroberts/example
-wool index.mjs
+wool list
+wool examples/lsjroberts/example/index.mjs
 ```
 
 ```
