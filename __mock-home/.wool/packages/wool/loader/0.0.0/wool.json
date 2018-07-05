@@ -1,0 +1,6 @@
+{
+  "name": "wool/loader",
+  "version": "0.0.0",
+  "entry": "src/loader.mjs",
+  "dependencies": {}
+}

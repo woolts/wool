@@ -5,10 +5,11 @@ import util from 'util';
 
 import cwd from './cwd';
 
-const woolHref = `file://${process.env.WOOL_PATH}`;
-const woolPackagesHref = `${woolHref}/packages`;
+const woolUrl = new URL(`file://${process.env.WOOL_PATH}/`);
+const woolPackagesUrl = new URL('packages/', woolUrl);
 
-const entryUrl = new URL(process.env.WOOL_ENTRY, new URL(`file://${cwd}`));
+const cwdUrl = new URL(`file://${cwd}`);
+const entryUrl = new URL(process.env.WOOL_ENTRY, cwdUrl);
 
 const TRACE = process.argv.includes('--wool-trace');
 const trace = (...args) => {
@@ -20,7 +21,7 @@ const resolved = {};
 const readPackageConfig = async url => {
   try {
     return JSON.parse(
-      await util.promisify(fs.readFile)(new URL(path.join(url, 'wool.json'))),
+      await util.promisify(fs.readFile)(new URL('wool.json', url)),
     );
   } catch (err) {
     // if (err.code !== 'ENOENT')
@@ -31,9 +32,7 @@ const readPackageConfig = async url => {
 const readPackageLock = async url => {
   try {
     return JSON.parse(
-      await util.promisify(fs.readFile)(
-        new URL(path.join(url, 'wool-lock.json')),
-      ),
+      await util.promisify(fs.readFile)(new URL('wool.lock', url)),
     );
   } catch (err) {
     // if (err.code !== 'ENOENT')
@@ -42,8 +41,6 @@ const readPackageLock = async url => {
 };
 
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
-  trace(specifier);
-
   // If this is a file path or non-namespaced specifier
   if (
     specifier.startsWith('/') ||
@@ -60,12 +57,14 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
       throw new Error('Can not handle typescript at the moment');
     }
 
+    trace(specifier, 'resolving with default resolver');
+
     // Otherwise, use the default resolver
     return defaultResolver(specifier, parentModuleUrl);
   }
 
   if (resolved[specifier]) {
-    trace(specifier, '|', 'from cache');
+    trace(specifier, 'resolving from cache');
     return {
       url: resolved[specifier],
       format: 'esm',
@@ -73,13 +72,15 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   }
 
   let entryLock;
-  let entryDir = path.resolve(cwd, process.env.WOOL_ENTRY);
+  let searchDir = path.resolve(cwd, process.env.WOOL_ENTRY);
   let found = false;
-  while (!found && entryDir !== '/') {
-    entryDir = path.dirname(entryDir);
-    const entryDirHref = `file://${entryDir}`;
+  let searchDirs = [];
+  while (!found && searchDir !== '/') {
+    searchDir = path.dirname(searchDir);
+    const searchDirUrl = new URL(`file://${searchDir}`);
+    searchDirs.push(searchDirUrl);
     try {
-      entryLock = await readPackageLock(entryDirHref);
+      entryLock = await readPackageLock(searchDirUrl);
       found = true;
     } catch (err) {
       // throw err;
@@ -87,41 +88,46 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   }
 
   if (!found) {
-    throw new Error(`wool-lock.json not found for ${specifier}`);
+    throw new Error(
+      `wool.lock not found at any of:\n  ${searchDirs
+        .map(s => new URL('wool.lock', `${s}/`).href)
+        .join('\n  ')}`,
+    );
   }
 
-  let specifierHref;
+  let specifierUrl;
 
-  if (entryLock[specifier].workspace) {
-    specifierHref = new URL(
-      `file://${path.join(cwd, entryLock[specifier].workspace)}`,
-    ).href;
-  } else {
-    specifierHref = new URL(
-      path.join(woolPackagesHref, specifier, entryLock[specifier].version),
-    ).href;
+  if (entryLock[specifier] && entryLock[specifier].workspace) {
+    specifierUrl = new URL(entryLock[specifier].workspace, cwdUrl);
+  } else if (entryLock[specifier]) {
+    specifierUrl = new URL(
+      `${specifier}/${entryLock[specifier].version}/`,
+      woolPackagesUrl,
+    );
   }
 
   // Try wool package resolution
   try {
-    const config = await readPackageConfig(specifierHref);
-    const url = new URL(`${specifierHref}/${config.entry}`).href;
+    const config = await readPackageConfig(specifierUrl);
+    const url = new URL(`${specifierUrl}/${config.entry}`).href;
+    resolved[specifier] = url;
     trace(
       specifier,
-      '|',
-      url.replace(new URL(woolPackagesHref).href, '$WOOL_PATH'),
+      'resolving from',
+      url.replace(new URL(woolPackagesUrl).href, '$WOOL_PATH/'),
     );
-    resolved[specifier] = url;
     return {
       url,
       format: 'esm',
     };
   } catch (err) {
     console.log(
-      `\nCould not find wool module\n\n    ${specifier}\n    ${specifierHref}\n\n`,
+      `\nCould not find wool module\n\n    ${specifier}\n    ${specifierUrl}\n\n`,
     );
     console.log(err);
     console.log('\n');
+
+    trace(specifier, 'falling back to resolving with default resolver');
 
     // Otherwise use default resolver
     return defaultResolver(specifier, parentModuleUrl);

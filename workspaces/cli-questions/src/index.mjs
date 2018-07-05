@@ -1,6 +1,6 @@
 import readline from 'readline';
 
-export async function inquire(questions) {
+export async function ask(questions) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,

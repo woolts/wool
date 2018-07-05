@@ -1,11 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import * as inquirer from 'wool/inquirer';
+import * as cliQuestions from 'wool/cli-questions';
 import * as semver from 'wool/semver';
 
-const woolUrl = new URL(`file://${process.env.WOOL_PATH}`);
-const localPackagesUrl = new URL('./packages/', woolUrl);
+import {
+  localPackagesUrl,
+  readPackageConfig,
+  writePackageConfig,
+} from '../../utils';
 
 const isValidName = specifier => {
   // https://regex101.com/r/s7UWNw/1
@@ -41,36 +44,23 @@ const toSentence = array => {
   return array.slice(0, -1).join(', ') + ' and ' + array[array.length - 1];
 };
 
-const readPackageConfig = async url => {
-  try {
-    return JSON.parse(
-      await util.promisify(fs.readFile)(
-        new URL(path.join(`file://${url}`, 'wool.json')),
-      ),
-    );
-  } catch (err) {
-    // if (err.code !== 'ENOENT')
-    throw err;
-  }
-};
+export default async function add(flags, ...specifiers) {
+  const woolConfig = await readPackageConfig(`file://${process.cwd()}`);
 
-const writePackageConfig = async (url, config) => {
-  try {
-    await util.promisify(fs.writeFile)(
-      new URL(path.join(`file://${url}`, 'wool.json')),
-      JSON.stringify(config, null, 2),
-    );
-  } catch (err) {
-    // if (err.code !== 'ENOENT')
-    throw err;
-  }
-};
-
-export default async function add(...specifiers) {
   // 1. Find the available registries, including $WOOL_HOME
 
   // 2. Loop the specifiers
   const plan = specifiers.map(name => {
+    // z. If this is a directory, remove the existing version and install it directly
+    if (specifier === '.') {
+      // TODO: all directories
+      return {
+        name: woolConfig.name,
+        version: woolConfig.version,
+        local: true,
+      };
+    }
+
     if (!isValidName(name)) {
       return {
         name,
@@ -80,9 +70,23 @@ export default async function add(...specifiers) {
 
     // a. Search each registry in sequence for the specifier
     const localVersions = searchLocalPackages(name);
+    const registryVersions = {};
+
+    woolConfig.registries.forEach(registry => {
+      registryVersions[registry] = {};
+      // i. http request, search registry for name, get versions
+    });
 
     // b. Find the highest version that satisifies the constraints
-    const maxVersion = semver.findMaxVersion(Object.keys(localVersions));
+    const possibleVersions = [
+      ...Object.keys(localVersions),
+      ...Object.values(registryVersions).reduce(
+        (acc, registry) => [...acc, ...Object.keys(registry)],
+        [],
+      ),
+    ];
+    console.log(possibleVersions);
+    const maxVersion = semver.findMaxVersion(possibleVersions);
     const constraint = semver.toSafeConstraintFromVersion(maxVersion);
 
     // c. If specifier found, gather into collection of found specifiers
@@ -90,7 +94,7 @@ export default async function add(...specifiers) {
       name,
       constraint,
       localVersions,
-      registry: false,
+      registryVersions,
     };
   });
 
@@ -116,7 +120,7 @@ export default async function add(...specifiers) {
   console.log('');
   console.log('Adding a total of ?kb to your dependencies.');
   console.log('');
-  const { confirmInstall } = await inquirer.inquire([
+  const { confirmInstall } = await cliQuestions.ask([
     {
       type: 'confirm',
       name: 'confirmInstall',
@@ -132,7 +136,6 @@ export default async function add(...specifiers) {
   }
 
   // b. If user accepts plan, install packages into $WOOL_HOME and update wool.json
-  const woolConfig = await readPackageConfig(process.cwd());
   woolConfig.dependencies = woolConfig.dependencies || {};
   plan.forEach(dep => {
     woolConfig.dependencies[dep.name] = dep.constraint;

@@ -2,8 +2,13 @@
   "name": "wool/cli",
   "version": "0.0.0",
   "entry": "src/cli.mjs",
+  "bin": {
+    "wool": "bin/wool"
+  },
   "dependencies": {
-    "wool/inquirer": ":workspace",
+    "wool/cli-args": ":workspace",
+    "wool/cli-questions": ":workspace",
+    "wool/process": ":workspace",
     "wool/semver": ":workspace"
   }
 }

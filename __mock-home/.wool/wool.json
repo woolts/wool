@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "config": {
+    "namespace": "lsjroberts"
+  },
+  "dependencies": {
+    "wool/cli": "1.0.0 <= v < 2.0.0"
+  }
+}
