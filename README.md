@@ -38,3 +38,6 @@ wool examples/lsjroberts/example/index.mjs
 ```
 bob/package -- alice/package -- lsjroberts/example
 ```
+
+![image of local command output](_screenshots/local.png)
+![image of list command output](_screenshots/list.png)
