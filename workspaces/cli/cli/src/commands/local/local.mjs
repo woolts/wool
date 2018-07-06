@@ -50,6 +50,8 @@ async function installPackage(dir, maybeVersion) {
   await exec(`cp -R ${dir}/* ${targetDir}`);
 
   console.log(
-    `Installed ${colors.cyan(config.name)} at ${colors.blue(version)}`,
+    `Installed ${colors.cyan(config.name)} at ${colors.blue(
+      version,
+    )} from ${colors.white(dir.replace(`${process.cwd()}/`, ''))}`,
   );
 }

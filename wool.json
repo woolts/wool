@@ -6,9 +6,6 @@
   ],
   "workspaces": [
     "workspaces/cli",
-    "workspaces/cli-args",
-    "workspaces/cli-colors",
-    "workspaces/cli-questions",
     "workspaces/loader",
     "workspaces/process",
     "workspaces/registry",
