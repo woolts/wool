@@ -37,7 +37,7 @@ Every command has the following options:
 - `--help` - Display detailed help on usage (todo)
 - `--dry-run` - Disables all side effects and outputs the actions that would have occurred (todo)
 
-**Execute a node file** (✔)
+**Execute a node file** (✓)
 
 Due to how wool changes the way modules are loaded, node files can not be run with `node` only. Instead the loader must be provided, the simplest shortcut to this is to use wool:
 
