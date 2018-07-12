@@ -3,7 +3,7 @@ import path from 'path';
 import { URL } from 'url';
 import util from 'util';
 
-import cwd from './cwd';
+const cwd = process.cwd();
 
 const woolUrl = new URL(`file://${process.env.WOOL_PATH}/`);
 const woolPackagesUrl = new URL('packages/', woolUrl);
