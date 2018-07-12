@@ -30,6 +30,24 @@ wool list --global
 
 And you should see a list of the installed `wool/*` packages.
 
+## Build
+
+> _todo: use `wool` to install npm deps and run build script._
+
+To build the dist bundle, use:
+
+```
+npm ci
+npm run build
+chmod +x dist/wool.js
+```
+
+Then run it with:
+
+```
+node dist/wool.js list --global
+```
+
 ## CLI
 
 Every command has the following options:

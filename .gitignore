@@ -1,3 +1,6 @@
+dist
+node_modules
+
 # Editors
 .vscode
 
@@ -5,5 +8,4 @@
 .DS_Store
 
 # Temp
-__mock-home
 _old

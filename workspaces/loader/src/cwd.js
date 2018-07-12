@@ -1,1 +1,1 @@
-module.exports = process.cwd();
+export default process.cwd();
