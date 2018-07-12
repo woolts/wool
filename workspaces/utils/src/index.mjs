@@ -21,6 +21,12 @@ export const readPackageConfig = async url =>
 export const writePackageConfig = (url, config) =>
   writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
 
+export const readPackageLock = async url =>
+  JSON.parse(await readFile(new URL('wool.lock', url)));
+
+export const writePackageLock = (url, config) =>
+  writeFile(new URL('wool.lock', url), JSON.stringify(config, null, 2));
+
 export const readPackageVersionLock = async url =>
   JSON.parse(await readFile(new URL('wool.version', url)));
 
@@ -32,6 +38,12 @@ export const readActivePackageConfig = () =>
 
 export const writeActivePackageConfig = config =>
   writePackageConfig(pathToUrl(process.cwd()), config);
+
+export const readActivePackageLock = () =>
+  readPackageLock(pathToUrl(process.cwd()));
+
+export const writeActivePackageLock = config =>
+  writePackageLock(pathToUrl(process.cwd()), config);
 
 export const readActivePackageVersionLock = () =>
   readPackageVersionLock(pathToUrl(process.cwd()));
