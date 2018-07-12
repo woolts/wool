@@ -7,10 +7,10 @@ mkdir -p $WOOL_PATH/packages/wool/process/0.0.0/
 mkdir -p $WOOL_PATH/packages/wool/semver/0.0.0/
 mkdir -p $WOOL_PATH/packages/wool/utils/0.0.0/
 
-cp -R workspaces/cli/* $WOOL_PATH/packages/wool/cli/0.0.0/
-cp -R workspaces/cli-args/* $WOOL_PATH/packages/wool/cli-args/0.0.0/
-cp -R workspaces/cli-colors/* $WOOL_PATH/packages/wool/cli-colors/0.0.0/
-cp -R workspaces/cli-questions/* $WOOL_PATH/packages/wool/cli-questions/0.0.0/
+cp -R workspaces/cli/cli/* $WOOL_PATH/packages/wool/cli/0.0.0/
+cp -R workspaces/cli/cli-args/* $WOOL_PATH/packages/wool/cli-args/0.0.0/
+cp -R workspaces/cli/cli-colors/* $WOOL_PATH/packages/wool/cli-colors/0.0.0/
+cp -R workspaces/cli/cli-questions/* $WOOL_PATH/packages/wool/cli-questions/0.0.0/
 cp -R workspaces/loader/* $WOOL_PATH/packages/wool/loader/0.0.0/
 cp -R workspaces/process/* $WOOL_PATH/packages/wool/process/0.0.0/
 cp -R workspaces/semver/* $WOOL_PATH/packages/wool/semver/0.0.0/
