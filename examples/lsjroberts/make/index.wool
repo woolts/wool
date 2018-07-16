@@ -1,0 +1,4 @@
+// import bob from 'bob/package';
+
+// console.log(bob('lsjroberts/make'));
+console.log('lsjroberts/make');

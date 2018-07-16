@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
-import { resolve } from '../workspaces/loader/src/loader.mjs';
+import { resolve } from 'wool/loader';
 
 export default function wool(options = {}) {
   return {

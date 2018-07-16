@@ -1,0 +1,8 @@
+{
+  "alice/package": {
+    "version": "1.0.0"
+  },
+  "bob/package": {
+    "version": "1.0.0"
+  }
+}

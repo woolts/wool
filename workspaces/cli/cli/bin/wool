@@ -11,7 +11,7 @@ run_node() {
   node --experimental-modules --loader "$loader_path" $*
 }
 
-if [[ $1 == *.mjs ]]
+if [[ $1 == *.mjs ]] || [[ $1 == *.wool ]]
 then
   run_node $1
 else
