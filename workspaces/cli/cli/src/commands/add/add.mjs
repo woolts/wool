@@ -122,7 +122,12 @@ export default async function add({ args }) {
   // 1. Find the available registries, including $WOOL_HOME
 
   // 2. Loop the specifiers
-  const plan = await resolveSpecifiers(woolConfig, specifiers, []);
+  const plan = (await resolveSpecifiers(woolConfig, specifiers, [])).sort(
+    (left, right) => {
+      if (left.name === right.name) return 0;
+      return left.name < right.name ? -1 : 1;
+    },
+  );
 
   const validPlan = plan.filter(dep => !dep.invalid);
   const invalidPlan = plan.filter(dep => dep.invalid);
@@ -163,10 +168,16 @@ export default async function add({ args }) {
   }
 
   // b. If user accepts plan, install packages into $WOOL_HOME and update wool.json
-  woolConfig.dependencies = woolConfig.dependencies || {};
+  const newDependencies = woolConfig.dependencies || {};
   plan.forEach(dep => {
-    woolConfig.dependencies[dep.name] = dep.constraint;
+    newDependencies[dep.name] = dep.constraint;
   });
+  const sortedDependencyNames = Object.keys(newDependencies).sort();
+  woolConfig.dependencies = {};
+  sortedDependencyNames.forEach(sorted => {
+    woolConfig.dependencies[sorted] = newDependencies[sorted];
+  });
+
   await writeActivePackageConfig(woolConfig);
   console.log(colors.green('Installed.'));
   console.log('');
