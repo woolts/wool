@@ -8,7 +8,7 @@ const writeFile = promisify(fs.writeFile);
 // Paths
 export const woolPath = process.env.WOOL_PATH;
 export const localPackagesPath = path.join(woolPath, 'packages');
-export const woolUrl = new URL(`file://${process.env.WOOL_PATH}`);
+export const woolUrl = new URL(`file://${process.env.WOOL_PATH}/`);
 export const localPackagesUrl = new URL('./packages/', woolUrl);
 
 export const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
