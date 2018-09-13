@@ -4,7 +4,7 @@ export default {
   name: 'make',
   action,
   alias: 'm',
-  arguments: '<path>',
+  arguments: '<dir>',
   options: [
     {
       name: 'output',
@@ -14,7 +14,13 @@ export default {
     },
   ],
   examples: [
-    ['wool make hello.mjs', 'Compile hello.mjs into hello.js'],
-    ['wool make hello.mjs --output dist.js', 'Compile hello.mjs into dist.js'],
+    [
+      'wool make .',
+      'Compile current directory, if it contains a `wool.json` file',
+    ],
+    [
+      'wool make src',
+      'Compile `src` directory, if it contains a `wool.json` file',
+    ],
   ],
 };

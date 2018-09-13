@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "esnext",
+    "baseUrl": "examples",
+    "paths": {},
+    "outDir": "../../wool-stuff/build-artifacts/alice/package/1.0.0"
+  },
+  "references": [],
+  "include": [
+    "./*"
+  ]
+}

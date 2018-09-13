@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "module": "esnext",
+    "baseUrl": "examples",
+    "paths": {
+      "alice/package": [
+        "/Users/laurenceroberts/Code/Gelatin/wool/examples/alice/package/index.ts",
+        "/Users/laurenceroberts/.wool/packages/alice/package/1.0.0/index.js"
+      ],
+      "bob/package": [
+        "/Users/laurenceroberts/Code/Gelatin/wool/examples/bob/package/index.ts",
+        "/Users/laurenceroberts/.wool/packages/bob/package/1.0.0/index.js"
+      ]
+    },
+    "outDir": "../../wool-stuff/build-artifacts/lsjroberts/example/1.1.0"
+  },
+  "references": [
+    {
+      "path": "../../alice/package"
+    },
+    {
+      "path": "../../bob/package"
+    }
+  ],
+  "include": [
+    "./*"
+  ]
+}

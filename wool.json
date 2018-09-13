@@ -11,8 +11,6 @@
     "workspaces/registry",
     "workspaces/semver",
     "workspaces/utils",
-    "examples/alice/package",
-    "examples/bob/package",
-    "examples/lsjroberts/example"
+    "examples"
   ]
 }
