@@ -1,6 +1,6 @@
 {
   "name": "wool/cli",
-  "entry": "src/cli.mjs",
+  "entry": "src/cli.ts",
   "bin": {
     "wool": "bin/wool"
   },

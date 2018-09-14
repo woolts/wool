@@ -1,4 +1,4 @@
 {
   "name": "wool/registry-ui",
-  "entry": "src/index.mjs"
+  "entry": "src/index.ts"
 }

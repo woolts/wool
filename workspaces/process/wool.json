@@ -1,6 +1,6 @@
 {
   "name": "wool/process",
-  "entry": "src/index.mjs",
+  "entry": "src/index.ts",
   "registries": [],
   "dependencies": {}
 }

@@ -1,7 +1,6 @@
 {
-  "name": "alice/package",
+  "name": "nested/one",
   "version": "1.0.0",
   "entry": "index.ts",
-  "nodeVersion": "10.5.0 <= v < 11.0.0",
   "dependencies": {}
 }

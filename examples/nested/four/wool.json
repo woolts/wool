@@ -1,0 +1,7 @@
+{
+  "name": "nested/four",
+  "entry": "src/index.ts",
+  "dependencies": {
+    "bob/package": "1.0.0 <= v < 2.0.0"
+  }
+}

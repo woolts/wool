@@ -1,5 +1,7 @@
+# Generated files
 dist
 wool-stuff
+tsconfig.json
 
 # Editors
 .vscode

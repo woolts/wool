@@ -1,5 +1,5 @@
 {
   "name": "wool/cli-colors",
-  "entry": "index.mjs",
+  "entry": "index.ts",
   "dependencies": {}
 }

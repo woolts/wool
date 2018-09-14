@@ -1,4 +1,4 @@
 {
   "name": "wool/registry-server",
-  "entry": "src/index.mjs"
+  "entry": "src/index.ts"
 }

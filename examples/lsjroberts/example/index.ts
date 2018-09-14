@@ -1,3 +1,3 @@
-import bob from 'bob/package';
+import example from './example';
 
-console.log(bob('lsjroberts/example'));
+export default example;

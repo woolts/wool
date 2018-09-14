@@ -1,5 +1,7 @@
 {
   "name": "wool/cli-args",
-  "entry": "src/index.mjs",
-  "dependencies": {}
+  "entry": "src/index.ts",
+  "dependencies": {
+    "wool/utils": "0.0.0 <= v < 1.0.0"
+  }
 }

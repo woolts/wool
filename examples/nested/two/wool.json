@@ -1,0 +1,7 @@
+{
+  "name": "nested/two",
+  "entry": "index.ts",
+  "dependencies": {
+    "nested/one": "1.0.0 <= v < 2.0.0"
+  }
+}

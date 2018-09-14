@@ -5,12 +5,11 @@
     "http://localhost:8080"
   ],
   "workspaces": [
-    "workspaces/cli",
     "workspaces/loader",
     "workspaces/process",
     "workspaces/registry",
     "workspaces/semver",
     "workspaces/utils",
-    "examples"
+    "workspaces/cli"
   ]
 }

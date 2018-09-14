@@ -1,5 +1,5 @@
 {
-  "name": "wool/cli-questions",
+  "name": "nested/three",
   "entry": "src/index.ts",
   "dependencies": {}
 }

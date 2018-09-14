@@ -2,9 +2,9 @@
   "private": true,
   "version": "0.0.0",
   "workspaces": [
-    "cli",
     "cli-args",
     "cli-colors",
-    "cli-questions"
+    "cli-questions",
+    "cli"
   ]
 }

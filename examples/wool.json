@@ -3,6 +3,7 @@
     "workspaces": [
       "alice/package",
       "bob/package",
-      "lsjroberts/example"
+      "lsjroberts/example",
+      "nested"
     ]
   }
