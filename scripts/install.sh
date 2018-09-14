@@ -20,3 +20,7 @@ mkdir -p $WOOL_PATH/.bin
 
 cd $WOOL_PATH/.bin
 ln -s ../packages/wool/cli/0.0.0/bin/wool .
+
+mkdir -p $WOOL_PATH/types
+
+cp -R scripts/resources/types/* $WOOL_PATH/types
