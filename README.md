@@ -1,6 +1,14 @@
 # Wool
 
-See http://gelatindesign.co.uk/coding/javascript-ecosystem
+Wool is a new typescript ecosystem designed for a great developer experience. Easy for beginners and scalable for advanced projects.
+
+It is a package manager, decentralised package registry, and monorepo compiler.
+
+With typescript only packages and automated semantic versioning it brings an extra level of stability to your projects.
+
+Many of the early ideas were described in [this article about a better javascript ecosystem](http://gelatindesign.co.uk/coding/javascript-ecosystem), though it has since evolved, notably becoming purely typescript.
+
+Wool is self compiling, so you can look at this repo to see how a project can be structured. For a simpler example see the [examples](examples) directory.
 
 ## Getting Started
 
@@ -30,24 +38,6 @@ wool list --global
 
 And you should see a list of the installed `wool/*` packages.
 
-## Build
-
-> _todo: use `wool` to install npm deps and run build script._
-
-To build the dist bundle, use:
-
-```
-npm ci
-npm run build
-chmod +x dist/wool.js
-```
-
-Then run it with:
-
-```
-node dist/wool.js list --global
-```
-
 ## CLI
 
 Every command has the following options:
@@ -55,12 +45,16 @@ Every command has the following options:
 - `--help` - Display detailed help on usage (todo)
 - `--dry-run` - Disables all side effects and outputs the actions that would have occurred (todo)
 
-**Execute a node file** (✓)
-
-Due to how wool changes the way modules are loaded, node files can not be run with `node` only. Instead the loader must be provided, the simplest shortcut to this is to use wool:
+**Compile a project**
 
 ```
-wool path/to/file.mjs
+wool make .
+```
+
+**Execute a node ts file** (todo)
+
+```
+wool path/to/file.ts
 ```
 
 **Initialise a project** (todo)
