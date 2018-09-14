@@ -1,5 +1,7 @@
 # Wool
 
+**This project is very early pre-alpha, not everything described here exists, and much of it will not work as expected.**
+
 Wool is a new typescript ecosystem designed for a great developer experience. Easy for beginners and scalable for advanced projects.
 
 It is a package manager, decentralised package registry, and monorepo compiler.
