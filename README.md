@@ -10,12 +10,16 @@ Many of the early ideas were described in [this article about a better javascrip
 
 Wool is self compiling, so you can look at this repo to see how a project can be structured. For a simpler example see the [examples](examples) directory.
 
+Wool runs on a zero config philosophy, developers shouldn't need to worry about configuring their compilers, be that webpack or tsc, they should only be concerned with writing the code for their projects. To that end, the only configuration possible is naming, versioning, dependencies and structuring your workspaces.
+
+All packages are installed into a single directory, `~/.wool/packages`. Once you've installed a package on your machine, it doesn't need to be installed again, or copied to another location, or even symlinked. All packages are imported directly from this single directory. Starting a new project with packages you've already installed will be instantaneous.
+
 ## Getting Started
 
 While in development the installation step is manual.
 
 1.  Clone this repository
-2.  Install [node >= 10.5.0](https://nodejs.org/)
+2.  Install [node 10.9.0 <= v < 11.0.0](https://nodejs.org/)
 3.  Add `export WOOL_PATH=$HOME/.wool` to your profile
 4.  Add `PATH="$PATH:$WOOL_PATH/.bin"` to your profile
 5.  Run the installation script:
@@ -38,6 +42,117 @@ wool list --global
 
 And you should see a list of the installed `wool/*` packages.
 
+## Creating a new project
+
+In the future you will be able to do this by running `wool init`, but for now you can follow these instructions.
+
+In a new directory create a `wool.json` file:
+
+```json
+{
+  "name": "lsjroberts/my-project",
+  "entry": "index.ts",
+  "dependencies": {}
+}
+```
+
+Note the package name, `lsjroberts/my-projects`, all packages must be namespaced. (The only exception to this are node builtins that keep their non-namespaced names).
+
+In your entry file write your code:
+
+```ts
+// index.ts
+export default () => console.log('Hello, World!');
+```
+
+Then compile your project:
+
+```
+wool make .
+```
+
+It will compile it into your `wool-stuff/build-artifacts` directory, so it is best to add a `.gitignore`:
+
+```
+# Generated files
+wool-stuff
+tsconfig.json
+
+# Editors
+.vscode
+
+# System
+.DS_Store
+```
+
+Note how we ignore the generated `tsconfig.json` files. These are created each time you run `wool make .` and will contain paths specific to your machine, so you should not commit them to your project.
+
+### Workspaces
+
+Wool takes monorepos to the next level. You can have as many nested shared or independently versioned packages as you like in a single repo.
+
+Running `wool make .` in the root directory will then build all your packages and link them together as needed. You don't need to worry about which `node_modules` directory a package is being imported from, it just works. In fact, there are no `node_modules` directories.
+
+To add workspaces to your project, update your `wool.json`:
+
+```json
+{
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "workspaces/my-package",
+    "workspaces/another-package",
+    "some/other/directory/a-third-package"
+  ]
+}
+```
+
+Each of your workspaces should then have their own `wool.json`:
+
+```json
+// workspaces/my-package
+{
+  "name": "lsjroberts/my-package"
+}
+```
+
+In this case, its version is determined by the root version.
+
+If you wanted, you can have a root version, then another set of packages with their own shared version, and yet more packages that are independently versioned.
+
+```json
+{
+  "private": true,
+  "workspaces": [
+    "independent/my-package-one",
+    "independent/my-package-two",
+    "shared"
+  ]
+}
+```
+
+```json
+// shared
+{
+  "private": true,
+  "version": "2.3.0",
+  "workspaces": ["my-package-three", "my-package-four"]
+}
+```
+
+```json
+// shared/my-package-three
+{
+  "name": "lsjroberts/my-package-three"
+}
+```
+
+> **Important note:** The order of the list of workspaces is important. You currently must manually ensure a package that depends on a package within the same repo is listed _after_ its dependency.
+>
+> If you see typescript compilation errors about packages not being found when running `wool make .`, this is likely the cause.
+>
+> However, typescript lint errors in your IDE about missing packages are just your IDE not understanding wool. IDE support will come in the future.
+
 ## CLI
 
 Every command has the following options:
@@ -45,7 +160,7 @@ Every command has the following options:
 - `--help` - Display detailed help on usage (todo)
 - `--dry-run` - Disables all side effects and outputs the actions that would have occurred (todo)
 
-**Compile a project**
+**Compile a project** (✓)
 
 ```
 wool make .
