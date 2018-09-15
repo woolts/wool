@@ -23,23 +23,23 @@ export interface WoolConfig {
 
 export const readPackageConfig = url =>
   readFile(new URL('wool.json', url)).then(
-    buffer => buffer.toJSON().data as any, // TODO: as WoolConfig
+    buffer => JSON.parse(buffer.toString()), // TODO: as WoolConfig
   );
 
 export const writePackageConfig = (url, config) =>
   writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
 
 export const readPackageLock = url =>
-  readFile(new URL('wool.lock', url)).then(
-    buffer => buffer.toJSON().data as any,
+  readFile(new URL('wool.lock', url)).then(buffer =>
+    JSON.parse(buffer.toString()),
   );
 
 export const writePackageLock = (url, config) =>
   writeFile(new URL('wool.lock', url), JSON.stringify(config, null, 2));
 
 export const readPackageVersionLock = async url =>
-  readFile(new URL('wool.version', url)).then(
-    buffer => buffer.toJSON().data as any,
+  readFile(new URL('wool.version', url)).then(buffer =>
+    JSON.parse(buffer.toString()),
   );
 
 export const writePackageVersionLock = (url, config) =>

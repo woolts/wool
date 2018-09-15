@@ -21,12 +21,12 @@ const resolved = {};
 const readPackageConfig = url =>
   util
     .promisify(fs.readFile)(new URL('wool.json', url))
-    .then(buffer => buffer.toJSON().data);
+    .then(buffer => JSON.parse(buffer.toString()));
 
 const readPackageLock = url =>
   util
     .promisify(fs.readFile)(new URL('wool.lock', url))
-    .then(buffer => buffer.toJSON().data);
+    .then(buffer => JSON.parse(buffer.toString()));
 
 export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   // If this is a file path or non-namespaced specifier

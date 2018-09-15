@@ -108,7 +108,7 @@ async function makePackage(
           'wool.lock',
         )}`,
       );
-      await exec(`rm -rf ${path.join(localPackagesPath, name, version)}`);
+      // await exec(`rm -rf ${path.join(localPackagesPath, name, version)}`);
       await exec(`mkdir -p ${path.join(localPackagesPath, name, version)}`);
       await exec(
         `cp -R ${path.join(artifactsDir, name, version)} ${path.join(
@@ -117,9 +117,13 @@ async function makePackage(
         )}`,
       );
     })
-    .catch(result => {
+    .catch(error => {
       console.log('--- ERROR ---');
-      console.log(result.stdout);
+      if (error.stdout) {
+        console.log(error.stdout);
+      } else {
+        console.log(error.stack);
+      }
     });
 }
 
