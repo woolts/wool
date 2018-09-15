@@ -18,23 +18,7 @@ All packages are installed into a single directory, `~/.wool/packages`. Once you
 
 ## Getting Started
 
-While in development the installation step is manual.
-
-1.  Clone this repository
-2.  Install [node 10.9.0 <= v < 11.0.0](https://nodejs.org/)
-3.  Add `export WOOL_PATH=$HOME/.wool` to your profile
-4.  Add `PATH="$PATH:$WOOL_PATH/.bin"` to your profile
-5.  Run the installation script:
-
-```
-./scripts/install.sh
-```
-
-To uninstall use:
-
-```
-./scripts/uninstall.sh
-```
+While in development the installation step is manual. Go to the [releases](https://github.com/woolts/wool/releases) and follow the instructions.
 
 To test it is working, run:
 
