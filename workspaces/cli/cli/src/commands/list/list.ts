@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as colors from 'wool/cli-colors';
+import * as colors from 'wool/colors';
 import {
   localPackagesPath,
   readActivePackageConfig,

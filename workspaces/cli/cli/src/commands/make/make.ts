@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
-import * as colors from 'wool/cli-colors';
+import * as colors from 'wool/colors';
 import { exec } from 'wool/process';
 import {
   localPackagesPath,
@@ -118,7 +118,7 @@ async function makePackage(
       );
     })
     .catch(error => {
-      console.log('--- ERROR ---');
+      console.log(colors.red('--- ERROR ---'));
       if (error.stdout) {
         console.log(error.stdout);
       } else {

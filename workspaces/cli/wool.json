@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "workspaces": [
     "cli-args",
-    "cli-colors",
     "cli-questions",
     "cli"
   ]

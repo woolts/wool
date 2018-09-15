@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import * as colors from 'wool/cli-colors';
+import * as colors from 'wool/colors';
 import * as cliQuestions from 'wool/cli-questions';
 import * as semver from 'wool/semver';
 import {

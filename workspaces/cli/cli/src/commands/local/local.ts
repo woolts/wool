@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as colors from 'wool/cli-colors';
+import * as colors from 'wool/colors';
 import { exec } from 'wool/process';
 import {
   localPackagesPath,
