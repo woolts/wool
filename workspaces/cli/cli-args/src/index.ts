@@ -1,5 +1,26 @@
+import * as path from 'path';
+import { spawn } from 'wool/process';
+import { readInstalledPackageConfig, localPackagesPath } from 'wool/utils';
+
 export default async function run(app, args) {
   const [command, ...rest] = args;
+
+  // https://regex101.com/r/zxWhRM/1
+  if (/^[A-Za-z0-9-]+\/[A-Za-z0-9-]+\/[0-9]+\.[0-9]+\.[0-9]+$/.test(command)) {
+    const [namespace, name, version] = command.split('/');
+    const config = await readInstalledPackageConfig(
+      `${namespace}/${name}`,
+      version,
+    );
+    return spawn('wool', [
+      path.join(
+        localPackagesPath,
+        config.name,
+        config.version,
+        config.entry.replace('.ts', '.mjs'),
+      ),
+    ]);
+  }
 
   const found = app.commands.filter(c => c.name === command)[0];
 

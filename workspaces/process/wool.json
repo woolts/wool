@@ -2,5 +2,7 @@
   "name": "wool/process",
   "entry": "src/index.ts",
   "registries": [],
-  "dependencies": {}
+  "dependencies": {
+    "wool/colors": "0.0.0 <= v < 1.0.0"
+  }
 }

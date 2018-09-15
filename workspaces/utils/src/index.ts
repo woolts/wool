@@ -63,6 +63,9 @@ export const readActivePackageVersionLock = () =>
 export const writeActivePackageVersionLock = config =>
   writePackageVersionLock(pathToUrl(process.cwd()), config);
 
+export const readInstalledPackageConfig = (name, version) =>
+  readPackageConfig(new URL(`${path.join(name, version)}/`, localPackagesUrl));
+
 // Workspaces
 export async function resolveWorkspaces(dir, version = '', parentDir = '') {
   const config = await readPackageConfig(pathToUrl(dir));

@@ -1,5 +1,8 @@
 {
-    "wool/utils": {
-        "verison": "0.0.0"
-    }
+  "wool/process": {
+    "version": "0.0.0"
+  },
+  "wool/utils": {
+    "version": "0.0.0"
+  }
 }
