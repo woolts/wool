@@ -8,7 +8,6 @@
     "workspaces/loader",
     "workspaces/colors",
     "workspaces/process",
-    "workspaces/registry",
     "workspaces/semver",
     "workspaces/utils",
     "workspaces/cli"
