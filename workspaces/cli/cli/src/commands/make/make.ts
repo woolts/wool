@@ -49,6 +49,7 @@ export default async function make({ args, options }) {
   );
 }
 
+// TODO: reduce the number of arguments this function takes
 async function makePackage(
   artifactsDir,
   rootDir,
@@ -84,10 +85,42 @@ async function makePackage(
   );
 
   // await exec(`tsc -p ${tsconfigPath} --traceResolution`).catch(result => {
-  await exec(`tsc -p ${tsconfigPath}`).catch(result => {
-    console.log('--- ERROR ---');
-    console.log(result.stdout);
-  });
+  await exec(`tsc -p ${tsconfigPath}`)
+    .then(async () => {
+      await exec(
+        'find ' +
+          artifactsDir +
+          ' -name "*.js" | sed \'s/^\\(.*\\)\\.js$/mv "\\1.js" "\\1.mjs"/\' | sh',
+      );
+      await exec(
+        `cp ${path.join(dir, 'wool.json')} ${path.join(
+          artifactsDir,
+          name,
+          version,
+          'wool.json',
+        )}`,
+      );
+      await exec(
+        `cp ${path.join(dir, 'wool.lock')} ${path.join(
+          artifactsDir,
+          name,
+          version,
+          'wool.lock',
+        )}`,
+      );
+      await exec(`rm -rf ${path.join(localPackagesPath, name, version)}`);
+      await exec(`mkdir -p ${path.join(localPackagesPath, name, version)}`);
+      await exec(
+        `cp -R ${path.join(artifactsDir, name, version)} ${path.join(
+          localPackagesPath,
+          name,
+        )}`,
+      );
+    })
+    .catch(result => {
+      console.log('--- ERROR ---');
+      console.log(result.stdout);
+    });
 }
 
 function tsconfigTemplate(
@@ -106,7 +139,6 @@ function tsconfigTemplate(
     if (workspaces && workspaces[dep]) {
       paths[dep] = [
         // ./lsjroberts/example
-        // path.resolve(rootDir, dep, "index.ts"),
         path.relative(
           rootDir,
           path.resolve(
@@ -140,19 +172,8 @@ function tsconfigTemplate(
       paths,
       typeRoots: ['/Users/laurenceroberts/.wool/types'],
       outDir,
-      // outDir: path.relative(
-      //   dir,
-      //   path.resolve(
-      //     process.cwd(),
-      //     // rootDir,
-      //     "wool-stuff/build-artifacts",
-      //     name,
-      //     version
-      //   )
-      // )
     },
     references,
     include: ['./**/*'],
-    // files: ['./index.ts'],
   };
 }

@@ -98,7 +98,9 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
   // Try wool package resolution
   try {
     const config: any = await readPackageConfig(specifierUrl);
-    const url = new URL(`${specifierUrl}/${config.entry}`).href;
+    const url = new URL(
+      `${specifierUrl}/${config.entry.replace('.ts', '.mjs')}`,
+    ).href;
     resolved[specifier] = url;
     trace(
       specifier,
