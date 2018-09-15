@@ -168,6 +168,22 @@ Every command has the following options:
 wool make .
 ```
 
+**Run a package** (todo)
+
+Instead of polluting your global list of binaries on your machine, you can execute the entry file of any installed wool project through `wool`.
+
+```
+wool lsjroberts/example
+```
+
+Run a specific version:
+
+```
+wool lsjroberts/example/1.1.0
+```
+
+<!--
+
 **Execute a node ts file** (todo)
 
 ```
@@ -225,12 +241,15 @@ ls ~/.wool/.bin/example
 > ~/.wool/.bin/example -> ../packages/lsjroberts/package/1.0.0/bin/example.sh
 ```
 
+-->
+
 <!-- **Symlink a package to `~/.wool/packages`** (todo)
 
 ```
 wool link .
 ``` -->
 
+<!--
 **Version a package** (wip)
 
 ```
@@ -316,3 +335,4 @@ bob/package -- alice/package -- lsjroberts/example
 
 ![image of local command output](_screenshots/local.png)
 ![image of list command output](_screenshots/list.png)
+-->
