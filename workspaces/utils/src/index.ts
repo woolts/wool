@@ -15,9 +15,6 @@ export const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
 export const urlToPath = u => u.href.replace('file://', '');
 
 // Configs
-// export type WoolConfig = WoolPackageConfig | WoolWorkspaceConfig;
-export type WoolConfig = any;
-
 interface WoolCommonConfig {
   version?: string;
   registries?: Array<string>;
@@ -34,6 +31,9 @@ interface WoolWorkspaceConfig extends WoolCommonConfig {
   private: boolean;
   workspaces: Array<string>;
 }
+
+// export type WoolConfig = WoolPackageConfig | WoolWorkspaceConfig;
+export type WoolConfig = any;
 
 export interface WoolLock {
   [key: string]: {
@@ -93,18 +93,25 @@ export const readInstalledPackageConfig = (
   readPackageConfig(new URL(`${path.join(name, version)}/`, localPackagesUrl));
 
 // Workspaces
+interface ResolvedWorkspace {
+  dir: string;
+  version: string;
+  parentDir: string;
+  config: WoolConfig;
+}
+
 export async function resolveWorkspaces(
   dir: string,
   version: string = '',
   parentDir: string = '',
-) {
+): Promise<{ [name: string]: ResolvedWorkspace }> {
   const config = await readPackageConfig(pathToUrl(dir));
   let resolvedWorkspaces = {};
 
   if (!(<WoolWorkspaceConfig>config).workspaces) {
     if (!(<WoolPackageConfig>config).name) {
       throw new Error(
-        'Cannot install a package that does not have a name or any workspaces.',
+        'Can not resolve a package that does not have a name or any workspaces.',
       );
     }
 
