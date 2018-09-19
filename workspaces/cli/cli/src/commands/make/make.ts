@@ -20,12 +20,26 @@ export default async function make({ args, options }) {
   // lock files, we should error early before compilation. Split into
   // three stages: preparation, validation and compiliation.
 
+  // TODO: Skip packages that do not need to be built (based on touch time
+  // compared to last build time).
+
+  // TODO: Always make into cwd/wool-stuff/build-artifacts, not relative to
+  // entry dir. This prevents duplicating artifacts in sub-directories and
+  // will help incremental builds.
+
+  // TODO: Incrementally build, if possible through typescript then by file,
+  // else by package.
+
+  // TODO: Add a --watch flag.
+
   const resolvedDir = path.resolve(process.cwd(), args.dir);
   const artifactsDir = path.join(resolvedDir, '/wool-stuff/build-artifacts');
   const config = await readPackageConfig(pathToUrl(resolvedDir));
 
   await exec(`rm -rf ${artifactsDir}`);
 
+  // TOOD: remove this as it should not be needed since resolveWorkspaces
+  // handles the single package situation
   if (!config.workspaces) {
     await makePackage(
       artifactsDir,
