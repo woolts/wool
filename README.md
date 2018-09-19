@@ -28,6 +28,8 @@ wool list --global
 
 And you should see a list of the installed `wool/*` packages.
 
+Unless stated on a new release, to upgrade you should be able to simply clone this repo and run `wool make .` inside it. This will install the latest code within each package into `~/.wool/packages`.
+
 ## Creating a new project
 
 In the future you will be able to do this by running `wool init`, but for now you can follow these instructions.
