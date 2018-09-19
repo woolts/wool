@@ -150,22 +150,36 @@ Every command has the following options:
 
 **Compile a project** (✓)
 
+Compiles all workspaces in the given directory into `./wool-stuff/build-artifacts`, and copy successful packages into your `~/wool` directory ready to be used by any project on your machine.
+
 ```
 wool make .
 ```
 
-**Run a package** (todo)
+**Run a package** (wip)
 
 Instead of polluting your global list of binaries on your machine, you can execute the entry file of any installed wool project through `wool`.
+
+(todo)
 
 ```
 wool lsjroberts/example
 ```
 
-Run a specific version:
+Run a specific version (✓)
 
 ```
 wool lsjroberts/example/1.1.0
+```
+
+**Pack a workspace into gzipped bundles** (✓)
+
+Bundles each package into `./wool-stuff/bundles/lsjroberts_example-1.0.0.tar.gz`.
+
+Usually you will not need to run this command directly, but it can be helpful to do so if you wish to debug the bundle that will be published to your registries.
+
+```
+wool pack .
 ```
 
 <!--
