@@ -6,6 +6,7 @@ import { exec } from 'wool/process';
 import {
   localPackagesPath,
   pathToUrl,
+  readInstalledPackageConfig,
   readPackageConfig,
   readPackageLock,
   resolveWorkspaces,
@@ -14,6 +15,11 @@ import {
 const writeFile = promisify(fs.writeFile);
 
 export default async function make({ args, options }) {
+  // TODO: Before compiling, we should inspect the workspaces and dependencies.
+  // If we can detect any future problems, such as missing dependencies or
+  // lock files, we should error early before compilation. Split into
+  // three stages: preparation, validation and compiliation.
+
   const resolvedDir = path.resolve(process.cwd(), args.dir);
   const artifactsDir = path.join(resolvedDir, '/wool-stuff/build-artifacts');
   const config = await readPackageConfig(pathToUrl(resolvedDir));
@@ -70,7 +76,7 @@ async function makePackage(
   await writeFile(
     tsconfigPath,
     JSON.stringify(
-      tsconfigTemplate(
+      await tsconfigTemplate(
         artifactsDir,
         rootDir,
         dir,
@@ -87,11 +93,15 @@ async function makePackage(
   // await exec(`tsc -p ${tsconfigPath} --traceResolution`).catch(result => {
   await exec(`tsc -p ${tsconfigPath}`)
     .then(async () => {
+      const relativeArtifactsDir = path.relative(process.cwd(), artifactsDir);
+
+      // TODO: This is duplicating .js files to .mjs, in an ideal world we would
+      // only store .mjs files. However typescript does not recognise these
+      // from the `paths` option, and node esm loaders use .mjs files.
       await exec(
-        'find ' +
-          artifactsDir +
-          ' -name "*.js" | sed \'s/^\\(.*\\)\\.js$/mv "\\1.js" "\\1.mjs"/\' | sh',
+        `find ${relativeArtifactsDir} -name "*.js" -type f -exec bash -c 'cp "$1" "\${1%.js}".mjs' - '{}' \\;`,
       );
+
       await exec(
         `cp ${path.join(dir, 'wool.json')} ${path.join(
           artifactsDir,
@@ -100,6 +110,9 @@ async function makePackage(
           'wool.json',
         )}`,
       );
+
+      // TODO: If there is no lock file we should install the latest and inform
+      // the user of the upgrade plan.
       await exec(
         `cp ${path.join(dir, 'wool.lock')} ${path.join(
           artifactsDir,
@@ -108,13 +121,19 @@ async function makePackage(
           'wool.lock',
         )}`,
       );
+
+      // TODO: We want to clean out the package if we re-build it, however this
+      // will break other packages that import the compiled package.
       // await exec(`rm -rf ${path.join(localPackagesPath, name, version)}`);
+
       await exec(`mkdir -p ${path.join(localPackagesPath, name, version)}`);
       await exec(
         `cp -R ${path.join(artifactsDir, name, version)} ${path.join(
           localPackagesPath,
           name,
         )}`,
+
+        // TODO: symlink binaries
       );
     })
     .catch(error => {
@@ -127,7 +146,7 @@ async function makePackage(
     });
 }
 
-function tsconfigTemplate(
+async function tsconfigTemplate(
   artifactsDir,
   rootDir,
   dir,
@@ -139,31 +158,45 @@ function tsconfigTemplate(
   const paths = {};
   const references = [];
 
-  Object.keys(lock).forEach(dep => {
-    if (workspaces && workspaces[dep]) {
-      paths[dep] = [
-        // ./lsjroberts/example
-        path.relative(
-          rootDir,
-          path.resolve(
+  await Promise.all(
+    Object.keys(lock).map(async dep => {
+      if (workspaces && workspaces[dep]) {
+        paths[dep] = [
+          // ./lsjroberts/example
+          path.relative(
             rootDir,
-            workspaces[dep].dir,
-            workspaces[dep].config.entry,
+            path.resolve(
+              rootDir,
+              workspaces[dep].dir,
+              workspaces[dep].config.entry,
+            ),
           ),
-        ),
-      ];
-      references.push({
-        path: path.relative(dir, workspaces[dep].dir),
-      });
-    } else {
-      paths[dep] = [
-        // ~/.wool/packages/lsjroberts/example/1.0.0
-        path.join(localPackagesPath, dep, `${lock[dep].version}`, 'index.js'),
-      ];
-    }
-  });
+        ];
+        references.push({
+          path: path.relative(dir, workspaces[dep].dir),
+        });
+      } else {
+        const installedConfig = await readInstalledPackageConfig(
+          dep,
+          lock[dep].version,
+        );
+        paths[dep] = [
+          // ~/.wool/packages/lsjroberts/example/1.0.0
+          path.relative(
+            rootDir,
+            path.join(
+              localPackagesPath,
+              dep,
+              `${lock[dep].version}`,
+              installedConfig.entry.replace('.ts', '.js'),
+            ),
+          ),
+        ];
+      }
+    }),
+  );
 
-  const outDir = path.join(artifactsDir, name, version);
+  const outDir = path.relative(dir, path.join(artifactsDir, name, version));
 
   return {
     compilerOptions: {
@@ -174,7 +207,7 @@ function tsconfigTemplate(
       target: 'esnext',
       baseUrl: path.relative(dir, rootDir),
       paths,
-      typeRoots: ['/Users/laurenceroberts/.wool/types'],
+      typeRoots: ['/Users/laurenceroberts/.wool/types'], // TODO: localTypesPath
       outDir,
     },
     references,
