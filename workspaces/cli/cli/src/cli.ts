@@ -1,10 +1,10 @@
 import run from 'wool/cli-args';
 
 // import add from './commands/add';
-// import bundle from './commands/bundle';
 import list from './commands/list';
 // import local from './commands/local';
 import make from './commands/make';
+import pack from './commands/pack';
 // import version from './commands/version';
 
 const app = {
@@ -12,10 +12,10 @@ const app = {
   version: '0.0.0',
   commands: [
     // add,
-    // bundle,
     list,
     // local,
     make,
+    pack,
     // version,
   ],
 };

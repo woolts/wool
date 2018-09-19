@@ -1,9 +1,8 @@
-import action from './bundle';
+import action from './pack';
 
 export default {
-  name: 'bundle',
-  alias: 'b',
-  arguments: '[path]',
+  name: 'pack',
+  arguments: '[dir]',
   options: [
     {
       name: 'version',
