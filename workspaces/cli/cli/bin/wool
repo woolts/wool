@@ -7,13 +7,15 @@ loader_path="$WOOL_PATH/packages/wool/loader/0.0.0/src/loader.mjs"
 cli_path="$WOOL_PATH/packages/wool/cli/0.0.0/src/cli.mjs"
 
 run_node() {
-  WOOL_ENTRY=$1 \
-  node --experimental-modules --loader "$loader_path" $*
+  WOOL_ENTRY=$1 node --experimental-modules --loader "$loader_path" $@
 }
 
 if [[ $1 == *.mjs ]] || [[ $1 == *.wool ]]
 then
-  run_node $1
+  # $1 == file to execute
+  # ${@:5} == rest of arguments after the "file node cli node" set of arguments
+  # that need to be ditched
+  run_node $1 ${@:3}
 else
-  run_node "$cli_path" $*
+  run_node "$cli_path" $@
 fi

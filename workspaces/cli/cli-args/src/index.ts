@@ -5,6 +5,7 @@ import { readInstalledPackageConfig, localPackagesPath } from 'wool/utils';
 export default async function run(app, args) {
   const [command, ...rest] = args;
 
+  // TODO: this should be defined in wool/cli, not here
   // https://regex101.com/r/zxWhRM/1
   if (/^[A-Za-z0-9-]+\/[A-Za-z0-9-]+\/[0-9]+\.[0-9]+\.[0-9]+$/.test(command)) {
     const [namespace, name, version] = command.split('/');
@@ -16,9 +17,10 @@ export default async function run(app, args) {
       path.join(
         localPackagesPath,
         config.name,
-        config.version,
+        version,
         config.entry.replace('.ts', '.mjs'),
       ),
+      ...process.argv.slice(2),
     ]);
   }
 
