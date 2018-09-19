@@ -10,18 +10,52 @@ import {
   readPackageConfig,
   readPackageLock,
   resolveWorkspaces,
+  writePackageConfig,
 } from 'wool/utils';
 
 const writeFile = promisify(fs.writeFile);
 
-export default async function make({ args, options }) {
+// export default async function make({ args }) {
+//   const resolvedDir = path.resolve(process.cwd(), args.dir);
+//   const artifactsDir = path.join(resolvedDir, '/wool-stuff/build-artifacts');
+
+//   await prepare(resolvedDir);
+// }
+
+async function prepare(resolvedDir, artifactsDir) {
+  const workspaces = await resolveWorkspaces(resolvedDir);
+  const dirtyWorkspaces = {};
+
+  for (let name in workspaces) {
+    const pkg = workspaces[name];
+    const [lastModifiedTime, lastModifiedFile] = (await exec(
+      `find ${
+        pkg.dir
+      } -type f -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1`,
+    )).split(' ');
+
+    const { compiledAt } = await readPackageConfig(
+      pathToUrl(path.join(artifactsDir, name, pkg.version)),
+    ).catch(() => ({ compiledAt: 9999999999 }));
+
+    if (
+      compiledAt === undefined ||
+      Number(lastModifiedTime) >= Math.floor(Number(compiledAt) / 1000)
+    ) {
+      dirtyWorkspaces[name] = pkg;
+    }
+  }
+
+  return dirtyWorkspaces;
+}
+
+async function compile() {}
+
+export default async function makeOld({ args, options }) {
   // TODO: Before compiling, we should inspect the workspaces and dependencies.
   // If we can detect any future problems, such as missing dependencies or
   // lock files, we should error early before compilation. Split into
   // three stages: preparation, validation and compiliation.
-
-  // TODO: Skip packages that do not need to be built (based on touch time
-  // compared to last build time).
 
   // TODO: Always make into cwd/wool-stuff/build-artifacts, not relative to
   // entry dir. This prevents duplicating artifacts in sub-directories and
@@ -33,40 +67,29 @@ export default async function make({ args, options }) {
   // TODO: Add a --watch flag.
 
   const resolvedDir = path.resolve(process.cwd(), args.dir);
-  const artifactsDir = path.join(resolvedDir, '/wool-stuff/build-artifacts');
-  const config = await readPackageConfig(pathToUrl(resolvedDir));
+  const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
 
-  await exec(`rm -rf ${artifactsDir}`);
+  const workspaces = await prepare(resolvedDir, artifactsDir);
 
-  // TOOD: remove this as it should not be needed since resolveWorkspaces
-  // handles the single package situation
-  if (!config.workspaces) {
+  for (let workspace in workspaces) {
     await makePackage(
       artifactsDir,
-      args.dir,
-      args.dir,
-      config.name,
-      config.version,
-      {},
+      workspaces[workspace].parentDir || args.dir,
+      workspaces[workspace].dir,
+      workspace,
+      workspaces[workspace].version,
+      workspaces,
     );
-  } else {
-    const workspaces = await resolveWorkspaces(resolvedDir);
-    for (let workspace in workspaces) {
-      await makePackage(
-        artifactsDir,
-        workspaces[workspace].parentDir || args.dir,
-        workspaces[workspace].dir,
-        workspace,
-        workspaces[workspace].version,
-        workspaces,
-      );
-    }
   }
 
-  console.log('');
-  console.log(
-    `Compiled into ${colors.white(artifactsDir.replace(process.cwd(), '.'))}`,
-  );
+  if (Object.keys(workspaces).length === 0) {
+    console.log(`No changes made since last compliation 👍`);
+  } else {
+    console.log('');
+    console.log(
+      `Compiled into ${colors.white(artifactsDir.replace(process.cwd(), '.'))}`,
+    );
+  }
 }
 
 // TODO: reduce the number of arguments this function takes
@@ -83,6 +106,15 @@ async function makePackage(
       dir.replace(process.cwd(), '.'),
     )}`,
   );
+
+  const packageArtifactDir = path.join(artifactsDir, name, version);
+  if (
+    packageArtifactDir !== '' &&
+    packageArtifactDir !== '/' &&
+    packageArtifactDir !== '~'
+  ) {
+    await exec(`rm -rf ${packageArtifactDir}`);
+  }
 
   const tsconfigPath = path.join(dir, 'tsconfig.json');
 
@@ -124,6 +156,13 @@ async function makePackage(
           'wool.json',
         )}`,
       );
+
+      const artifactUrl = pathToUrl(path.join(artifactsDir, name, version));
+      const artifactConfig = await readPackageConfig(artifactUrl);
+      await writePackageConfig(artifactUrl, {
+        ...artifactConfig,
+        compiledAt: Date.now(),
+      });
 
       // TODO: If there is no lock file we should install the latest and inform
       // the user of the upgrade plan.
