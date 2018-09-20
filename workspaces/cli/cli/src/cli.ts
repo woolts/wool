@@ -5,6 +5,7 @@ import list from './commands/list';
 // import local from './commands/local';
 import make from './commands/make';
 import pack from './commands/pack';
+import publish from './commands/publish';
 // import version from './commands/version';
 
 const app = {
@@ -16,6 +17,7 @@ const app = {
     // local,
     make,
     pack,
+    publish,
     // version,
   ],
 };

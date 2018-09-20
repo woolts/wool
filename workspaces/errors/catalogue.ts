@@ -7,8 +7,10 @@ import * as format from './format';
 
 const readFile = promisify(fs.readFile);
 
-export const makeMissingWoolConfig = ({ dir, predictedName }) =>
-  [
+// -- MAKE
+
+export function makeMissingWoolConfig({ dir, predictedName }) {
+  return [
     format.title('Compilation error', dir),
     format.message(
       `I could not find a ${colors.red('wool.json')} file in this workspace.`,
@@ -28,13 +30,14 @@ export const makeMissingWoolConfig = ({ dir, predictedName }) =>
       ),
     ),
   ].join('\n\n');
+}
 
-export const makeTypescriptMissingModuleError = async ({
+export async function makeTypescriptMissingModuleError({
   filePath,
   line,
   pos,
   name,
-}) => {
+}) {
   const fileContents = await readFile(path.join(process.cwd(), filePath)).then(
     buffer => buffer.toString(),
   );
@@ -59,14 +62,14 @@ export const makeTypescriptMissingModuleError = async ({
       )} to install it and add it to your project.`,
     ),
   ].join('\n\n');
-};
+}
 
-export const makeTypescriptGenericError = async ({
+export async function makeTypescriptGenericError({
   filePath,
   line,
   pos,
   message,
-}) => {
+}) {
   const fileContents = await readFile(path.join(process.cwd(), filePath)).then(
     buffer => buffer.toString(),
   );
@@ -87,4 +90,23 @@ export const makeTypescriptGenericError = async ({
       String(line).length + 2 + Number(pos),
     )}${colors.red(format.repeat('^', fileContentsPosLength))}`,
   ].join('\n\n');
-};
+}
+
+// -- PUBLISH
+
+export function publishMissingRegistries() {
+  return [
+    format.title('Publish error', 'wool.json'),
+    format.message(
+      `Your root ${colors.red('wool.json')} config is missing a ${colors.red(
+        'registries',
+      )} array. I do not know where to publish your package.`,
+    ),
+    JSON.stringify({ registries: ['http://localhost:7777'] }, null, 2),
+    format.message(
+      `Please see ${colors.cyan(
+        'woolts.org/publishing',
+      )} for further information.`,
+    ),
+  ].join('\n\n');
+}
