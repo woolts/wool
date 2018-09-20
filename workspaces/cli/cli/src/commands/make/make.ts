@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import * as colors from 'wool/colors';
+import * as errors from 'wool/errors';
 import { exec } from 'wool/process';
 import {
   localPackagesPath,
@@ -22,8 +23,50 @@ const writeFile = promisify(fs.writeFile);
 //   await prepare(resolvedDir);
 // }
 
+export default async function make({ args, options }) {
+  // TODO: Before compiling, we should inspect the workspaces and dependencies.
+  // If we can detect any future problems, such as missing dependencies or
+  // lock files, we should error early before compilation. Split into
+  // three stages: preparation, validation and compiliation.
+
+  // TODO: Always make into cwd/wool-stuff/build-artifacts, not relative to
+  // entry dir. This prevents duplicating artifacts in sub-directories and
+  // will help incremental builds.
+
+  // TODO: Incrementally build, if possible through typescript then by file,
+  // else by package.
+
+  // TODO: Add a --watch flag.
+
+  const resolvedDir = path.resolve(process.cwd(), args.dir);
+  const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
+
+  let continueMake = true;
+  const workspaces = await prepare(resolvedDir, artifactsDir).catch(err => {
+    console.log('');
+    console.log(err.message);
+    continueMake = false;
+    return [];
+  });
+
+  if (!continueMake) return;
+
+  await compile(workspaces, artifactsDir, args);
+
+  if (Object.keys(workspaces).length === 0) {
+    console.log(`No changes made since last compilation 👍`);
+  } else {
+    console.log('');
+    console.log(
+      `Compiled into ${colors.white(artifactsDir.replace(process.cwd(), '.'))}`,
+    );
+  }
+}
+
 async function prepare(resolvedDir, artifactsDir) {
-  const workspaces = await resolveWorkspaces(resolvedDir);
+  const workspaces = await resolveWorkspaces(resolvedDir).catch(
+    handleWorkspaceError(resolvedDir),
+  );
   const dirtyWorkspaces = {};
 
   for (let name in workspaces) {
@@ -49,28 +92,11 @@ async function prepare(resolvedDir, artifactsDir) {
   return dirtyWorkspaces;
 }
 
-async function compile() {}
+async function validate(pkg) {
+  // Check existance of wool.lock
+}
 
-export default async function makeOld({ args, options }) {
-  // TODO: Before compiling, we should inspect the workspaces and dependencies.
-  // If we can detect any future problems, such as missing dependencies or
-  // lock files, we should error early before compilation. Split into
-  // three stages: preparation, validation and compiliation.
-
-  // TODO: Always make into cwd/wool-stuff/build-artifacts, not relative to
-  // entry dir. This prevents duplicating artifacts in sub-directories and
-  // will help incremental builds.
-
-  // TODO: Incrementally build, if possible through typescript then by file,
-  // else by package.
-
-  // TODO: Add a --watch flag.
-
-  const resolvedDir = path.resolve(process.cwd(), args.dir);
-  const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
-
-  const workspaces = await prepare(resolvedDir, artifactsDir);
-
+async function compile(workspaces, artifactsDir, args) {
   for (let workspace in workspaces) {
     await makePackage(
       artifactsDir,
@@ -79,15 +105,6 @@ export default async function makeOld({ args, options }) {
       workspace,
       workspaces[workspace].version,
       workspaces,
-    );
-  }
-
-  if (Object.keys(workspaces).length === 0) {
-    console.log(`No changes made since last compliation 👍`);
-  } else {
-    console.log('');
-    console.log(
-      `Compiled into ${colors.white(artifactsDir.replace(process.cwd(), '.'))}`,
     );
   }
 }
@@ -138,6 +155,7 @@ async function makePackage(
 
   // await exec(`tsc -p ${tsconfigPath} --traceResolution`).catch(result => {
   await exec(`tsc -p ${tsconfigPath}`)
+    .catch(handleTypescriptCompileError)
     .then(async () => {
       const relativeArtifactsDir = path.relative(process.cwd(), artifactsDir);
 
@@ -145,7 +163,8 @@ async function makePackage(
       // only store .mjs files. However typescript does not recognise these
       // from the `paths` option, and node esm loaders use .mjs files.
       await exec(
-        `find ${relativeArtifactsDir} -name "*.js" -type f -exec bash -c 'cp "$1" "\${1%.js}".mjs' - '{}' \\;`,
+        `find ${relativeArtifactsDir} -name "*.js" -type f -exec ` +
+          `bash -c 'cp "$1" "\${1%.js}".mjs' - '{}' \\;`,
       );
 
       await exec(
@@ -190,12 +209,8 @@ async function makePackage(
       );
     })
     .catch(error => {
-      console.log(colors.red('--- ERROR ---'));
-      if (error.stdout) {
-        console.log(error.stdout);
-      } else {
-        console.log(error.stack);
-      }
+      console.log('');
+      console.log(error.message);
     });
 }
 
@@ -266,4 +281,63 @@ async function tsconfigTemplate(
     references,
     include: ['./**/*'],
   };
+}
+
+function handleWorkspaceError(resolvedDir) {
+  return err => {
+    const missingWoolMatch = err.message.match(
+      /ENOENT: no such file or directory, open '(.+)wool\.json'/,
+    );
+
+    if (!missingWoolMatch) throw err;
+
+    const dir = missingWoolMatch[1].replace(`${resolvedDir}/`, '');
+    const predictedName = dir.split('/')[dir.split('/').length - 2];
+
+    throw new Error(errors.makeMissingWoolConfig({ dir, predictedName }));
+  };
+}
+
+async function handleTypescriptCompileError(err) {
+  const compileErrors = err.stdout.split('\n');
+
+  const formattedErrors = await Promise.all(
+    compileErrors.map(async compileError => {
+      // https://regex101.com/r/tWRRQ3/1
+      const cannotFindModuleMatch = compileError.match(
+        /([^(]+)\(([0-9]+),([0-9]+)\): error TS2307: Cannot find module '(.+)'\./,
+      );
+      const genericMatch = compileError.match(
+        /([^(]+)\(([0-9]+),([0-9]+)\): error (.+): (.+)/,
+      );
+
+      if (cannotFindModuleMatch) {
+        const [, filePath, line, pos, name] = cannotFindModuleMatch;
+        return await errors.makeTypescriptMissingModuleError({
+          filePath,
+          line,
+          pos,
+          name,
+        });
+      }
+
+      if (genericMatch) {
+        const [, filePath, line, pos, code, message] = genericMatch;
+        return await errors.makeTypescriptGenericError({
+          filePath,
+          line,
+          pos,
+          message,
+        });
+      }
+
+      return err.message;
+    }),
+  );
+
+  formattedErrors.push(
+    `There were ${formattedErrors.length - 1} compilation errors.`,
+  );
+
+  throw new Error(formattedErrors.join('\n\n\n'));
 }

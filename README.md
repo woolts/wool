@@ -150,7 +150,7 @@ Every command has the following options:
 
 **Compile a project** (✓)
 
-Compiles all workspaces in the given directory into `./wool-stuff/build-artifacts`, and copy successful packages into your `~/wool` directory ready to be used by any project on your machine.
+Compiles modified workspaces in the given directory into `./wool-stuff/build-artifacts`, and copies successful packages into your `~/wool` directory ready to be used by any project on your machine.
 
 ```
 wool make .

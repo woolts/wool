@@ -2,7 +2,7 @@
   "private": true,
   "version": "0.0.0",
   "registries": [
-    "http://localhost:8080"
+    "http://localhost:7777"
   ],
   "workspaces": [
     "workspaces/loader",
@@ -10,6 +10,7 @@
     "workspaces/process",
     "workspaces/semver",
     "workspaces/utils",
+    "workspaces/errors",
     "workspaces/cli"
   ]
 }
