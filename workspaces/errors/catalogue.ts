@@ -49,7 +49,7 @@ export const makeTypescriptMissingModuleError = async ({
   return [
     format.title('Missing package error', filePath),
     format.message(`I could not find the package ${colors.red(name)}.`),
-    `${line}| ${colors.white(fileContentsLine)}\n${format.repeat(
+    `${line}| ${fileContentsLine}\n${format.repeat(
       ' ',
       String(line).length + 2 + Number(pos),
     )}${colors.red(format.repeat('^', fileContentsPosLength))}`,
@@ -82,7 +82,7 @@ export const makeTypescriptGenericError = async ({
     format.title('Typescript error', filePath),
     format.message(message),
     // TODO: syntax highlighting
-    `${line}| ${colors.black(fileContentsLine)}\n${format.repeat(
+    `${line}| ${fileContentsLine}\n${format.repeat(
       ' ',
       String(line).length + 2 + Number(pos),
     )}${colors.red(format.repeat('^', fileContentsPosLength))}`,

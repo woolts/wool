@@ -13,9 +13,12 @@ export const repeat = (char, times) => {
 export const title = (label, location) =>
   colors.red(
     [
-      '--',
+      '❖',
       label.toUpperCase(),
-      repeat('-', WIDTH - label.length - location.length - 5 || 1),
+      // repeat(' ', (WIDTH - label.length - location.length - 8) / 2),
+      // '❖ ❖ ❖',
+      // repeat(' ', (WIDTH - label.length - location.length - 8) / 2),
+      repeat('-', WIDTH - label.length - location.length - 8 || 1),
       location,
     ].join(' '),
   );
