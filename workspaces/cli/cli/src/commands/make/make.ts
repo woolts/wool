@@ -42,7 +42,10 @@ export default async function make({ args, options }) {
   const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
 
   let continueMake = true;
-  const workspaces = await prepare(resolvedDir, artifactsDir).catch(err => {
+  const workspaces = await (options.force
+    ? resolveWorkspaces(resolvedDir)
+    : prepare(resolvedDir, artifactsDir)
+  ).catch(err => {
     console.log('');
     console.log(err.message);
     continueMake = false;

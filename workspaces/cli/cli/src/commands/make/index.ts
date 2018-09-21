@@ -7,10 +7,11 @@ export default {
   arguments: '<dir>',
   options: [
     {
-      name: 'output',
-      alias: 'o',
-      description: 'asdf',
-      default: 'wool.js',
+      name: 'force',
+      type: 'boolean',
+      alias: 'f',
+      description: 'Force all packages to be built, even if no recent changes.',
+      default: false,
     },
   ],
   examples: [
