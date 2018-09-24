@@ -5,7 +5,9 @@ import list from './commands/list';
 // import local from './commands/local';
 import make from './commands/make';
 import pack from './commands/pack';
+import runPrivate from './commands/run-private';
 import publish from './commands/publish';
+import runFallback from './commands/run';
 // import version from './commands/version';
 
 const app = {
@@ -18,8 +20,10 @@ const app = {
     make,
     pack,
     publish,
+    runPrivate,
     // version,
   ],
+  fallback: runFallback,
 };
 
 run(app, process.argv.slice(2)).catch(err => {

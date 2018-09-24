@@ -22,8 +22,9 @@ interface WoolCommonConfig {
 }
 
 interface WoolPackageConfig extends WoolCommonConfig {
-  name: string;
   entry: string;
+  name?: string;
+  private?: string;
   bin?: { [key: string]: string };
 }
 
@@ -41,10 +42,11 @@ export interface WoolLock {
   };
 }
 
+export const readJson = (url: URL): any =>
+  readFile(url).then(buffer => JSON.parse(buffer.toString()));
+
 export const readPackageConfig = (url: URL): Promise<WoolConfig> =>
-  readFile(new URL('wool.json', url)).then(buffer =>
-    JSON.parse(buffer.toString()),
-  );
+  readJson(new URL('wool.json', url));
 
 export const writePackageConfig = (
   url: URL,
@@ -53,17 +55,13 @@ export const writePackageConfig = (
   writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
 
 export const readPackageLock = (url: URL): Promise<WoolLock> =>
-  readFile(new URL('wool.lock', url)).then(buffer =>
-    JSON.parse(buffer.toString()),
-  );
+  readJson(new URL('wool.lock', url));
 
 export const writePackageLock = (url: URL, config: WoolLock): Promise<void> =>
   writeFile(new URL('wool.lock', url), JSON.stringify(config, null, 2));
 
 export const readPackageVersionLock = async (url: URL): Promise<any> =>
-  readFile(new URL('wool.version', url)).then(buffer =>
-    JSON.parse(buffer.toString()),
-  );
+  readJson(new URL('wool.version', url));
 
 export const writePackageVersionLock = (url: URL, config: any): Promise<void> =>
   writeFile(new URL('wool.version', url), JSON.stringify(config, null, 2));
@@ -96,6 +94,7 @@ export const readInstalledPackageConfig = (
 interface ResolvedWorkspace {
   dir: string;
   version: string;
+  private: boolean;
   parentDir: string;
   config: WoolConfig;
 }
@@ -109,16 +108,21 @@ export async function resolveWorkspaces(
   let resolvedWorkspaces = {};
 
   if (!(<WoolWorkspaceConfig>config).workspaces) {
-    if (!(<WoolPackageConfig>config).name) {
+    if (
+      !(<WoolPackageConfig>config).name &&
+      !(<WoolPackageConfig>config).private
+    ) {
       throw new Error(
-        'Can not resolve a package that does not have a name or any workspaces.',
+        'Can not resolve a package that does not have a name, any ' +
+          'workspaces and is not marked as private.',
       );
     }
 
     return {
-      [(<WoolPackageConfig>config).name]: {
+      [(<WoolPackageConfig>config).name || `private_${path.basename(dir)}`]: {
         dir,
         version: config.version || version,
+        private: config.private || false,
         parentDir,
         config,
       },

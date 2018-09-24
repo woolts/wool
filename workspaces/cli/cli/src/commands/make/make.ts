@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import * as colors from 'wool/colors';
-import * as errors from 'wool/errors';
+import { catalogue as errors } from 'wool/errors';
 import { exec } from 'wool/process';
 import {
   localPackagesPath,
@@ -15,13 +15,6 @@ import {
 } from 'wool/utils';
 
 const writeFile = promisify(fs.writeFile);
-
-// export default async function make({ args }) {
-//   const resolvedDir = path.resolve(process.cwd(), args.dir);
-//   const artifactsDir = path.join(resolvedDir, '/wool-stuff/build-artifacts');
-
-//   await prepare(resolvedDir);
-// }
 
 export default async function make({ args, options }) {
   // TODO: Before compiling, we should inspect the workspaces and dependencies.
@@ -103,31 +96,33 @@ async function compile(workspaces, artifactsDir, args) {
   for (let workspace in workspaces) {
     await makePackage(
       artifactsDir,
-      workspaces[workspace].parentDir || args.dir,
-      workspaces[workspace].dir,
-      workspace,
-      workspaces[workspace].version,
       workspaces,
+      workspace,
+      workspaces[workspace],
+      args,
     );
   }
 }
 
-// TODO: reduce the number of arguments this function takes
-async function makePackage(
-  artifactsDir,
-  rootDir,
-  dir,
-  name,
-  version,
-  workspaces,
-) {
+async function makePackage(artifactsDir, workspaces, name, pkg, args) {
+  const dir = pkg.dir;
+  const version = pkg.version;
+
+  const relativeArtifactsDir = path.relative(process.cwd(), artifactsDir);
+
+  const packageArtifactDir = path.join(
+    artifactsDir,
+    name,
+    !pkg.name && pkg.private ? '' : version,
+  );
+  const packageArtifactUrl = pathToUrl(packageArtifactDir);
+
   console.log(
     `Compiling ${colors.cyan(name)} from ${colors.white(
       dir.replace(process.cwd(), '.'),
     )}`,
   );
 
-  const packageArtifactDir = path.join(artifactsDir, name, version);
   if (
     packageArtifactDir !== '' &&
     packageArtifactDir !== '/' &&
@@ -144,11 +139,11 @@ async function makePackage(
     JSON.stringify(
       await tsconfigTemplate(
         artifactsDir,
-        rootDir,
-        dir,
-        name,
-        version,
+        packageArtifactDir,
         workspaces,
+        name,
+        pkg,
+        args,
         await readPackageLock(pathToUrl(dir)).catch(() => ({})),
       ),
       null,
@@ -160,8 +155,6 @@ async function makePackage(
   await exec(`tsc -p ${tsconfigPath}`)
     .catch(handleTypescriptCompileError)
     .then(async () => {
-      const relativeArtifactsDir = path.relative(process.cwd(), artifactsDir);
-
       // TODO: This is duplicating .js files to .mjs, in an ideal world we would
       // only store .mjs files. However typescript does not recognise these
       // from the `paths` option, and node esm loaders use .mjs files.
@@ -172,16 +165,13 @@ async function makePackage(
 
       await exec(
         `cp ${path.join(dir, 'wool.json')} ${path.join(
-          artifactsDir,
-          name,
-          version,
+          packageArtifactDir,
           'wool.json',
         )}`,
       );
 
-      const artifactUrl = pathToUrl(path.join(artifactsDir, name, version));
-      const artifactConfig = await readPackageConfig(artifactUrl);
-      await writePackageConfig(artifactUrl, {
+      const artifactConfig = await readPackageConfig(packageArtifactUrl);
+      await writePackageConfig(packageArtifactUrl, {
         ...artifactConfig,
         compiledAt: Date.now(),
       });
@@ -190,9 +180,7 @@ async function makePackage(
       // the user of the upgrade plan.
       await exec(
         `cp ${path.join(dir, 'wool.lock')} ${path.join(
-          artifactsDir,
-          name,
-          version,
+          packageArtifactDir,
           'wool.lock',
         )}`,
       );
@@ -201,15 +189,18 @@ async function makePackage(
       // will break other packages that import the compiled package.
       // await exec(`rm -rf ${path.join(localPackagesPath, name, version)}`);
 
+      if (!pkg.name && pkg.private) {
+        return;
+      }
+
       await exec(`mkdir -p ${path.join(localPackagesPath, name, version)}`);
       await exec(
         `cp -R ${path.join(artifactsDir, name, version)} ${path.join(
           localPackagesPath,
           name,
         )}`,
-
-        // TODO: symlink binaries
       );
+      // TODO: symlink binaries
     })
     .catch(error => {
       console.log('');
@@ -219,13 +210,16 @@ async function makePackage(
 
 async function tsconfigTemplate(
   artifactsDir,
-  rootDir,
-  dir,
-  name,
-  version,
+  packageArtifactDir,
   workspaces,
+  name,
+  pkg,
+  args,
   lock,
 ) {
+  const rootDir = pkg.parentDir || args.dir;
+  const dir = pkg.dir;
+
   const paths = {};
   const references = [];
 
@@ -267,7 +261,7 @@ async function tsconfigTemplate(
     }),
   );
 
-  const outDir = path.relative(dir, path.join(artifactsDir, name, version));
+  const outDir = path.relative(dir, packageArtifactDir);
 
   return {
     compilerOptions: {

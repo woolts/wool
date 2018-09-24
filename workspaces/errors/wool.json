@@ -1,6 +1,6 @@
 {
   "name": "wool/errors",
-  "entry": "catalogue.ts",
+  "entry": "index.ts",
   "dependencies": {
     "wool/colors": "0.0.0 <= v < 0.0.0"
   }

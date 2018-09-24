@@ -5,26 +5,14 @@ import { readInstalledPackageConfig, localPackagesPath } from 'wool/utils';
 export default async function run(app, args) {
   const [command, ...rest] = args;
 
-  // TODO: this should be defined in wool/cli, not here
-  // https://regex101.com/r/zxWhRM/1
-  if (/^[A-Za-z0-9-]+\/[A-Za-z0-9-]+\/[0-9]+\.[0-9]+\.[0-9]+$/.test(command)) {
-    const [namespace, name, version] = command.split('/');
-    const config = await readInstalledPackageConfig(
-      `${namespace}/${name}`,
-      version,
-    );
-    return spawn('wool', [
-      path.join(
-        localPackagesPath,
-        config.name,
-        version,
-        config.entry.replace('.ts', '.mjs'),
-      ),
-      ...process.argv.slice(2),
-    ]);
-  }
+  let found = app.commands.filter(c => c.name === command)[0];
 
-  const found = app.commands.filter(c => c.name === command)[0];
+  if (!found && app.fallback) {
+    found = app.fallback;
+
+    // Mock the first arg as `run` so the arg matcher picks up the correct args
+    rest.unshift('run');
+  }
 
   if (!found) {
     help(app);
