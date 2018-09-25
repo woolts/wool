@@ -163,14 +163,28 @@ Instead of polluting your global list of binaries on your machine, you can execu
 (todo)
 
 ```
-wool lsjroberts/example
+wool run lsjroberts/example
 ```
 
 Run a specific version (✓)
 
 ```
-wool lsjroberts/example/1.1.0
+wool run lsjroberts/example/1.1.0
 ```
+
+**Run a private package** (✓)
+
+If you have compiled a package that is marked as private, it will not be installed into your `~/.wool` directory, and therefore can not be run with `wool run`.
+
+To run this package use:
+
+```
+wool run-private lsjroberts/private-example
+```
+
+This will run it from your `./wool-stuff/build-artifacts` directory.
+
+Note, you do not need to provide a version number.
 
 **Pack a workspace into gzipped bundles** (✓)
 
@@ -180,20 +194,6 @@ Usually you will not need to run this command directly, but it can be helpful to
 
 ```
 wool pack .
-```
-
-<!--
-
-**Execute a node ts file** (todo)
-
-```
-wool path/to/file.ts
-```
-
-**Initialise a project** (todo)
-
-```
-wool init
 ```
 
 **Add a dependency** (wip)
@@ -240,6 +240,22 @@ wool add lsjroberts/package --global
 ls ~/.wool/.bin/example
 > ~/.wool/.bin/example -> ../packages/lsjroberts/package/1.0.0/bin/example.sh
 ```
+
+<!--
+
+**Execute a node ts file** (todo)
+
+```
+wool path/to/file.ts
+```
+
+**Initialise a project** (todo)
+
+```
+wool init
+```
+
+
 
 -->
 
