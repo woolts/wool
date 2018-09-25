@@ -2,15 +2,21 @@ import * as colors from 'wool/colors';
 
 const WIDTH = 80;
 
-export const repeat = (char, times) => {
+export default {
+  repeat,
+  title,
+  message,
+};
+
+function repeat(char, times) {
   const result = [];
   for (let i = 0; i < times; i++) {
     result.push(char);
   }
   return result.join('');
-};
+}
 
-export const title = (label, location) => {
+function title(label, location) {
   let spacerCount = WIDTH - label.length - location.length - 4;
   if (spacerCount < 2) spacerCount = 2;
 
@@ -25,9 +31,9 @@ export const title = (label, location) => {
       location,
     ].join(' '),
   );
-};
+}
 
-export const message = string => {
+function message(string) {
   const wrapped = [];
   const words = string.split(' ');
   let chars = 0;
@@ -42,4 +48,4 @@ export const message = string => {
     }
   });
   return wrapped.join(' ');
-};
+}

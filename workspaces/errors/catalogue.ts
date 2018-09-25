@@ -3,13 +3,23 @@ import * as path from 'path';
 import { promisify } from 'util';
 import * as colors from 'wool/colors';
 
-import * as format from './format';
+import format from './format';
 
 const readFile = promisify(fs.readFile);
 
+export default {
+  makeMissingWoolConfig,
+  makeTypescriptMissingModuleError,
+  makeTypescriptGenericError,
+  publishMissingRegistries,
+  publishRegistryConnectionRefused,
+  readPackageConfig,
+  readPackageLock,
+};
+
 // --- Make ---
 
-export function makeMissingWoolConfig({ dir, predictedName }) {
+function makeMissingWoolConfig({ dir, predictedName }) {
   return [
     format.title('Compilation error', dir),
     format.message(
@@ -32,12 +42,7 @@ export function makeMissingWoolConfig({ dir, predictedName }) {
   ].join('\n\n');
 }
 
-export async function makeTypescriptMissingModuleError({
-  filePath,
-  line,
-  pos,
-  name,
-}) {
+async function makeTypescriptMissingModuleError({ filePath, line, pos, name }) {
   const fileContents = await readFile(path.join(process.cwd(), filePath)).then(
     buffer => buffer.toString(),
   );
@@ -64,12 +69,7 @@ export async function makeTypescriptMissingModuleError({
   ].join('\n\n');
 }
 
-export async function makeTypescriptGenericError({
-  filePath,
-  line,
-  pos,
-  message,
-}) {
+async function makeTypescriptGenericError({ filePath, line, pos, message }) {
   const fileContents = await readFile(path.join(process.cwd(), filePath)).then(
     buffer => buffer.toString(),
   );
@@ -94,7 +94,7 @@ export async function makeTypescriptGenericError({
 
 // --- Publish ---
 
-export function publishMissingRegistries() {
+function publishMissingRegistries() {
   return [
     format.title('Publish error', 'wool.json'),
     format.message(
@@ -111,7 +111,7 @@ export function publishMissingRegistries() {
   ].join('\n\n');
 }
 
-export function publishRegistryConnectionRefused(registry) {
+function publishRegistryConnectionRefused(registry) {
   return [
     format.title('Publish error', registry),
     format.message(
@@ -126,7 +126,7 @@ export function publishRegistryConnectionRefused(registry) {
 
 // --- Utils ---
 
-export function readPackageConfig(err) {
+function readPackageConfig(err) {
   const cleanPath = err.path.replace(process.cwd(), '.');
 
   return [
@@ -143,7 +143,7 @@ export function readPackageConfig(err) {
   ].join('\n\n');
 }
 
-export function readPackageLock(err) {
+function readPackageLock(err) {
   const cleanPath = err.path.replace(process.cwd(), '.');
 
   return [
