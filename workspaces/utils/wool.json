@@ -1,5 +1,9 @@
 {
   "name": "wool/utils",
   "entry": "src/index.ts",
-  "dependencies": {}
+  "dependencies": {
+    "direct": {
+      "wool/errors": "0.0.0 <= v < 1.0.0"
+    }
+  }
 }

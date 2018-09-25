@@ -1,1 +1,6 @@
-{}
+{
+  "wool/errors": {
+    "version": "0.0.0",
+    "constraint": "0.0.0 <= v < 1.0.0"
+  }
+}

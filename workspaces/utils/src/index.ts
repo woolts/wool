@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
+import { catalogue as errors } from 'wool/errors';
 
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
@@ -13,6 +14,8 @@ export const localPackagesUrl = new URL('./packages/', woolUrl);
 
 export const pathToUrl = p => new URL(`file://${path.resolve(p)}/`);
 export const urlToPath = u => u.href.replace('file://', '');
+const normaliseUrl = (pOrU: URL | string): URL =>
+  typeof pOrU === 'string' ? pathToUrl(pOrU) : pOrU;
 
 // Configs
 interface WoolCommonConfig {
@@ -50,24 +53,38 @@ export interface WoolLock {
 }
 
 export const readJson = (url: URL | string): any =>
-  readFile(typeof url === 'string' ? pathToUrl(url) : url).then(buffer =>
-    JSON.parse(buffer.toString()),
-  );
+  readFile(normaliseUrl(url)).then(buffer => JSON.parse(buffer.toString()));
 
-export const readPackageConfig = (url: URL): Promise<WoolConfig> =>
-  readJson(new URL('wool.json', url));
+export const readPackageConfig = (url: URL | string): Promise<WoolConfig> =>
+  readJson(new URL('wool.json', normaliseUrl(url))).catch(err => {
+    console.error(errors.readPackageConfig(err));
+    throw err;
+  });
 
 export const writePackageConfig = (
-  url: URL,
+  url: URL | string,
   config: WoolConfig,
 ): Promise<void> =>
-  writeFile(new URL('wool.json', url), JSON.stringify(config, null, 2));
+  writeFile(
+    new URL('wool.json', normaliseUrl(url)),
+    JSON.stringify(config, null, 2),
+  );
 
-export const readPackageLock = (url: URL): Promise<WoolLock> =>
-  readJson(new URL('wool.lock', url));
+export const readPackageLock = (url: URL | string): Promise<WoolLock> =>
+  readJson(new URL('wool.lock', normaliseUrl(url))).catch(err => {
+    // TODO: get stack
+    console.error(errors.readPackageLock(err));
+    throw err;
+  });
 
-export const writePackageLock = (url: URL, config: WoolLock): Promise<void> =>
-  writeFile(new URL('wool.lock', url), JSON.stringify(config, null, 2));
+export const writePackageLock = (
+  url: URL | string,
+  config: WoolLock,
+): Promise<void> =>
+  writeFile(
+    new URL('wool.lock', normaliseUrl(url)),
+    JSON.stringify(config, null, 2),
+  );
 
 export const readPackageVersionLock = async (url: URL): Promise<any> =>
   readJson(new URL('wool.version', url));

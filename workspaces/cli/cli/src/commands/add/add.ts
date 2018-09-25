@@ -4,11 +4,14 @@ import * as cliQuestions from 'wool/cli-questions';
 import * as semver from 'wool/semver';
 import {
   localPackagesUrl,
-  readPackageConfig,
   readActivePackageConfig,
   readActivePackageLock,
+  readPackageConfig,
+  readPackageLock,
   writeActivePackageConfig,
   writeActivePackageLock,
+  writePackageConfig,
+  writePackageLock,
   woolPath,
 } from 'wool/utils';
 import { stringify } from 'querystring';
@@ -115,12 +118,20 @@ const resolveSpecifiers = (woolConfig, specifiers, init = []) =>
     .map(specifier => resolveSpecifierRecursively(woolConfig, specifier))
     .reduce(async (acc, next) => [...(await acc), ...(await next)], init);
 
-export default async function add({ args }) {
+export default async function add({ args, options }) {
   // TODO: use all names
   const specifiers = [args.name];
 
-  const woolConfig = await readActivePackageConfig();
-  const woolLock = await readActivePackageLock();
+  let woolConfig;
+  let woolLock;
+
+  if (options.workspace) {
+    woolConfig = await readPackageConfig(options.workspace);
+    woolLock = await readPackageLock(options.workspace);
+  } else {
+    woolConfig = await readActivePackageConfig();
+    woolLock = await readActivePackageLock();
+  }
 
   // 1. Find the available registries, including $WOOL_HOME
 
@@ -172,10 +183,9 @@ export default async function add({ args }) {
 
   // b. If user accepts plan, install packages into $WOOL_HOME and update wool.json
   const keyedPlan = {};
-  const newDependencies = woolConfig.dependencies || {
-    direct: {},
-    indirect: {},
-  };
+  const newDependencies = woolConfig.dependencies || {};
+  newDependencies.direct = newDependencies.direct || {};
+  newDependencies.indirect = newDependencies.indirect || {};
 
   plan.forEach(dep => {
     keyedPlan[dep.name] = dep;
@@ -221,8 +231,13 @@ export default async function add({ args }) {
     }
   });
 
-  await writeActivePackageConfig(woolConfig);
-  await writeActivePackageLock(newLock);
+  if (options.workspace) {
+    await writePackageConfig(options.workspace, woolConfig);
+    await writePackageLock(options.workspace, newLock);
+  } else {
+    await writeActivePackageConfig(woolConfig);
+    await writeActivePackageLock(newLock);
+  }
 
   console.log(colors.green('Installed.'));
   console.log('');

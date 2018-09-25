@@ -4,6 +4,9 @@
   "entry": "index.ts",
   "nodeVersion": "10.5.0 <= v < 11.0.0",
   "dependencies": {
-    "alice/package": "1.0.0 <= v < 2.0.0"
+    "direct": {
+      "alice/package": "1.0.0 <= v < 2.0.0"
+    },
+    "indirect": {}
   }
 }

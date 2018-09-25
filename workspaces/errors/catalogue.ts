@@ -7,7 +7,7 @@ import * as format from './format';
 
 const readFile = promisify(fs.readFile);
 
-// -- MAKE
+// --- Make ---
 
 export function makeMissingWoolConfig({ dir, predictedName }) {
   return [
@@ -92,7 +92,7 @@ export async function makeTypescriptGenericError({
   ].join('\n\n');
 }
 
-// -- PUBLISH
+// --- Publish ---
 
 export function publishMissingRegistries() {
   return [
@@ -108,5 +108,39 @@ export function publishMissingRegistries() {
         'woolts.org/publishing',
       )} for further information.`,
     ),
+  ].join('\n\n');
+}
+
+// --- Utils ---
+
+export function readPackageConfig(err) {
+  const cleanPath = err.path.replace(process.cwd(), '.');
+
+  return [
+    format.title('Missing package config', cleanPath),
+    format.message(`I could not find ${colors.red(cleanPath)}.`),
+    format.message(
+      `I recommend either running ${colors.cyan(
+        'wool init',
+      )} within the directory or manually creating a ${colors.white(
+        'wool.json',
+      )} file.`,
+    ),
+    format.message('Alternatively, you may be looking in the wrong directory.'),
+  ].join('\n\n');
+}
+
+export function readPackageLock(err) {
+  const cleanPath = err.path.replace(process.cwd(), '.');
+
+  return [
+    format.title('Missing package lock', cleanPath),
+    format.message(`I could not find ${colors.red(cleanPath)}.`),
+    format.message(
+      `I recommend running ${colors.cyan(
+        `wool make ${cleanPath.replace('wool.lock', '').replace('./', '.')}`,
+      )} to create it.`,
+    ),
+    format.message('Alternatively, you may be looking in the wrong directory.'),
   ].join('\n\n');
 }

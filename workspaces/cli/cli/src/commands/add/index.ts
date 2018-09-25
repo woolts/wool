@@ -11,6 +11,11 @@ export default {
       alias: 'g',
       description: "Add the package's binaries to your global path",
     },
+    {
+      name: 'workspace',
+      alias: 'w',
+      description: 'The workspace to add the package to',
+    },
   ],
   examples: [
     [
