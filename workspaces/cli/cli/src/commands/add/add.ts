@@ -6,9 +6,12 @@ import {
   localPackagesUrl,
   readPackageConfig,
   readActivePackageConfig,
+  readActivePackageLock,
   writeActivePackageConfig,
+  writeActivePackageLock,
   woolPath,
 } from 'wool/utils';
+import { stringify } from 'querystring';
 
 const isValidName = specifier => {
   // https://regex101.com/r/s7UWNw/1
@@ -117,6 +120,7 @@ export default async function add({ args }) {
   const specifiers = [args.name];
 
   const woolConfig = await readActivePackageConfig();
+  const woolLock = await readActivePackageLock();
 
   // 1. Find the available registries, including $WOOL_HOME
 
@@ -167,17 +171,59 @@ export default async function add({ args }) {
   }
 
   // b. If user accepts plan, install packages into $WOOL_HOME and update wool.json
-  const newDependencies = woolConfig.dependencies || {};
+  const keyedPlan = {};
+  const newDependencies = woolConfig.dependencies || {
+    direct: {},
+    indirect: {},
+  };
+
   plan.forEach(dep => {
-    newDependencies[dep.name] = dep.constraint;
+    keyedPlan[dep.name] = dep;
+    if (specifiers.includes(dep.name)) {
+      newDependencies.direct[dep.name] = dep.constraint;
+    } else {
+      newDependencies.indirect[dep.name] = dep.constraint;
+    }
   });
-  const sortedDependencyNames = Object.keys(newDependencies).sort();
-  woolConfig.dependencies = {};
-  sortedDependencyNames.forEach(sorted => {
-    woolConfig.dependencies[sorted] = newDependencies[sorted];
+
+  const sortedLockNames = [
+    ...Object.keys(keyedPlan),
+    ...Object.keys(woolLock),
+  ].sort();
+  const sortedDirectDependencyNames = Object.keys(
+    newDependencies.direct,
+  ).sort();
+  const sortedIndirectDependencyNames = Object.keys(
+    newDependencies.indirect,
+  ).sort();
+
+  woolConfig.dependencies = {
+    direct: {},
+    indirect: {},
+  };
+
+  sortedDirectDependencyNames.forEach(sorted => {
+    woolConfig.dependencies.direct[sorted] = newDependencies.direct[sorted];
+  });
+  sortedIndirectDependencyNames.forEach(sorted => {
+    woolConfig.dependencies.indirect[sorted] = newDependencies.indirect[sorted];
+  });
+
+  const newLock = {};
+  sortedLockNames.forEach(sorted => {
+    if (keyedPlan[sorted]) {
+      newLock[sorted] = {
+        version: keyedPlan[sorted].maxVersion,
+        constraint: keyedPlan[sorted].constraint,
+      };
+    } else {
+      newLock[sorted] = woolLock[sorted];
+    }
   });
 
   await writeActivePackageConfig(woolConfig);
+  await writeActivePackageLock(newLock);
+
   console.log(colors.green('Installed.'));
   console.log('');
   console.log(

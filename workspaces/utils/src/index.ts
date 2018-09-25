@@ -18,7 +18,14 @@ export const urlToPath = u => u.href.replace('file://', '');
 interface WoolCommonConfig {
   version?: string;
   registries?: Array<string>;
-  dependencies?: { [key: string]: string };
+  dependencies?: {
+    direct: {
+      [key: string]: string;
+    };
+    indirect?: {
+      [key: string]: string;
+    };
+  };
 }
 
 interface WoolPackageConfig extends WoolCommonConfig {
