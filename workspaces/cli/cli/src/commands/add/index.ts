@@ -4,7 +4,7 @@ export default {
   name: 'add',
   action,
   alias: 'a',
-  arguments: '<name>',
+  args: '<name>',
   options: [
     {
       name: 'global',

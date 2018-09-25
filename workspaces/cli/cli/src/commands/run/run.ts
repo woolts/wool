@@ -23,6 +23,6 @@ export default async function run({ args }) {
       version,
       config.entry.replace('.ts', '.mjs'),
     ),
-    ...process.argv.slice(2),
+    ...process.argv.slice(4),
   ]);
 }

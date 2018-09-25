@@ -2,7 +2,7 @@ import action from './pack';
 
 export default {
   name: 'pack',
-  arguments: '[dir]',
+  args: '[dir]',
   options: [
     {
       name: 'version',

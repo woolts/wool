@@ -1,18 +1,16 @@
-import * as path from 'path';
-import { spawn } from 'wool/process';
-import { readInstalledPackageConfig, localPackagesPath } from 'wool/utils';
-
 export default async function run(app, args) {
   const [command, ...rest] = args;
 
+  // TODO: validate app
+
   let found = app.commands.filter(c => c.name === command)[0];
 
-  if (!found && app.fallback) {
-    found = app.fallback;
+  // if (!found && app.fallback) {
+  //   found = app.fallback;
 
-    // Mock the first arg as `run` so the arg matcher picks up the correct args
-    rest.unshift('run');
-  }
+  //   // Mock the first arg as `run` so the arg matcher picks up the correct args
+  //   rest.unshift('run');
+  // }
 
   if (!found) {
     help(app);
@@ -24,7 +22,7 @@ export default async function run(app, args) {
     return Promise.resolve();
   }
 
-  const namedArguments = matchArguments(found.arguments, rest);
+  const namedArguments = matchArguments(found.args, rest);
   const options = matchOptions(found.options, rest);
 
   return await found.action({ args: namedArguments, options });
@@ -40,7 +38,7 @@ function help(app) {
 }
 
 function helpCommand(app, command) {
-  console.log(`${command.name} ${command.arguments}`);
+  console.log(`${command.name} ${command.args}`);
   console.log('');
   console.log('Options');
   console.log('');
@@ -151,7 +149,7 @@ parse({
   ],
   commands: [
     ['a, add', 'Add a package to your dependencies', {
-      arguments: '<name>',
+      args: '<name>',
       options: [
         ['-g, --global', "Add the package's binaries to your global path"]
       ],

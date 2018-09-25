@@ -42,8 +42,10 @@ export interface WoolLock {
   };
 }
 
-export const readJson = (url: URL): any =>
-  readFile(url).then(buffer => JSON.parse(buffer.toString()));
+export const readJson = (url: URL | string): any =>
+  readFile(typeof url === 'string' ? pathToUrl(url) : url).then(buffer =>
+    JSON.parse(buffer.toString()),
+  );
 
 export const readPackageConfig = (url: URL): Promise<WoolConfig> =>
   readJson(new URL('wool.json', url));

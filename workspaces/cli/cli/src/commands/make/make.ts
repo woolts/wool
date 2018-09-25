@@ -31,6 +31,8 @@ export default async function make({ args, options }) {
 
   // TODO: Add a --watch flag.
 
+  // TODO: Copy bins and symlink to ~/.wool/.bin
+
   const resolvedDir = path.resolve(process.cwd(), args.dir);
   const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
 

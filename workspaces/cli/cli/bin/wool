@@ -14,9 +14,9 @@ run_node() {
 if [[ $1 == *.mjs ]] || [[ $1 == *.wool ]]
 then
   # $1 == file to execute
-  # ${@:5} == rest of arguments after the "file node cli node" set of arguments
+  # ${@:2} == rest of arguments after the "file node cli node" set of arguments
   # that need to be ditched
-  run_node $1 ${@:3}
+  run_node $1 ${@:2}
 else
   run_node "$cli_path" $@
 fi

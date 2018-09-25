@@ -10,18 +10,22 @@ export const repeat = (char, times) => {
   return result.join('');
 };
 
-export const title = (label, location) =>
-  colors.red(
+export const title = (label, location) => {
+  let spacerCount = WIDTH - label.length - location.length - 4;
+  if (spacerCount < 2) spacerCount = 2;
+
+  return colors.red(
     [
       '❖',
       label.toUpperCase(),
       // repeat(' ', (WIDTH - label.length - location.length - 8) / 2),
       // '❖ ❖ ❖',
       // repeat(' ', (WIDTH - label.length - location.length - 8) / 2),
-      repeat('-', WIDTH - label.length - location.length - 8 || 1),
+      repeat('-', spacerCount),
       location,
     ].join(' '),
   );
+};
 
 export const message = string => {
   const wrapped = [];

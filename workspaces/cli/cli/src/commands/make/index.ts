@@ -4,7 +4,7 @@ export default {
   name: 'make',
   action,
   alias: 'm',
-  arguments: '<dir>',
+  args: '<dir>',
   options: [
     {
       name: 'force',

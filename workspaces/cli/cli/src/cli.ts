@@ -20,10 +20,10 @@ const app = {
     make,
     pack,
     publish,
+    runFallback,
     runPrivate,
     // version,
   ],
-  fallback: runFallback,
 };
 
 run(app, process.argv.slice(2)).catch(err => {

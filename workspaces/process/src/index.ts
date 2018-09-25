@@ -2,7 +2,7 @@ import * as child_process from 'child_process';
 import * as util from 'util';
 import * as colors from 'wool/colors';
 
-export const exec = command => {
+export const exec = (command: string) => {
   if (process.argv.includes('--wool-debug')) {
     console.log(colors.gray('exec ::'), colors.gray(command));
   }
@@ -14,7 +14,7 @@ export const exec = command => {
     });
 };
 
-export const spawn = (command, args?: any, options?: any) => {
+export const spawn = (command: string, args?: Array<string>, options?: any) => {
   if (process.argv.includes('--wool-debug')) {
     console.log(
       colors.gray('spawn ::'),
