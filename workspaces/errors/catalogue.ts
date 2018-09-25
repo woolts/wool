@@ -111,6 +111,19 @@ export function publishMissingRegistries() {
   ].join('\n\n');
 }
 
+export function publishRegistryConnectionRefused(registry) {
+  return [
+    format.title('Publish error', registry),
+    format.message(
+      `I could not connect to ${colors.red(
+        registry,
+      )}, check your network settings or if the registry is offline.`,
+    ),
+    format.message('To start a local registry, try running:'),
+    `    ${colors.cyan('wool run you/registry registry-name')}`,
+  ].join('\n\n');
+}
+
 // --- Utils ---
 
 export function readPackageConfig(err) {
