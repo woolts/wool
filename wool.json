@@ -9,8 +9,8 @@
     "workspaces/colors",
     "workspaces/process",
     "workspaces/semver",
-    "workspaces/utils",
     "workspaces/errors",
+    "workspaces/utils",
     "workspaces/cli"
   ]
 }

@@ -8,10 +8,7 @@ export const exec = (command: string) => {
   }
   return util
     .promisify(child_process.exec)(command)
-    .then(({ stdout, stderr }) => {
-      if (stderr) throw new Error(stderr);
-      return stdout;
-    });
+    .then(({ stdout }) => stdout);
 };
 
 export const spawn = (command: string, args?: Array<string>, options?: any) => {
@@ -23,5 +20,10 @@ export const spawn = (command: string, args?: Array<string>, options?: any) => {
     );
   }
   const withDefaults = { stdio: 'inherit', ...options };
-  return util.promisify(child_process.spawn)(command, args, withDefaults);
+  return new Promise((resolve, reject) => {
+    const spawned = child_process.spawn(command, args, withDefaults);
+    spawned.on('error', reject);
+    spawned.on('closed', resolve);
+    spawned.on('exit', resolve);
+  });
 };

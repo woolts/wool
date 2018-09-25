@@ -53,11 +53,6 @@ export default async function make({ args, options }) {
 
   if (Object.keys(workspaces).length === 0) {
     console.log(`No changes made since last compilation 👍`);
-  } else {
-    console.log('');
-    console.log(
-      `Compiled into ${colors.white(artifactsDir.replace(process.cwd(), '.'))}`,
-    );
   }
 }
 
@@ -120,8 +115,10 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
   const packageArtifactUrl = pathToUrl(packageArtifactDir);
 
   console.log(
-    `Compiling ${colors.cyan(name)} from ${colors.white(
-      dir.replace(process.cwd(), '.'),
+    `🐑 Compiling ${colors.cyan(name)} from ${colors.white(
+      dir.replace(`${process.cwd()}/`, ''),
+    )} into ${colors.magenta(
+      packageArtifactDir.replace(`${process.cwd()}/`, ''),
     )}`,
   );
 
