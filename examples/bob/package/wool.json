@@ -2,7 +2,9 @@
   "name": "bob/package",
   "version": "1.0.0",
   "entry": "index.ts",
-  "nodeVersion": "10.5.0 <= v < 11.0.0",
+  "registries": [
+    "http://localhost:7777"
+  ],
   "dependencies": {
     "direct": {
       "alice/package": "1.0.0 <= v < 2.0.0"

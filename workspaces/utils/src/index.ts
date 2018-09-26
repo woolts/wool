@@ -18,7 +18,7 @@ const normaliseUrl = (pOrU: URL | string): URL =>
   typeof pOrU === 'string' ? pathToUrl(pOrU) : pOrU;
 
 // Configs
-interface WoolCommonConfig {
+export interface WoolCommonConfig {
   version?: string;
   registries?: Array<string>;
   dependencies?: {

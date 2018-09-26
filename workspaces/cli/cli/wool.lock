@@ -3,20 +3,24 @@
     "version": "0.0.0",
     "range": "0.0.0 <= v < 1.0.0"
   },
-  "wool/colors": {
-    "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
-  },
   "wool/cli-questions": {
     "version": "0.0.0",
     "range": "0.0.0 <= v < 1.0.0"
+  },
+  "wool/colors": {
+    "version": "0.0.0",
+    "constraint": "0.0.0 <= v < 1.0.0"
   },
   "wool/errors": {
     "version": "0.0.0"
   },
   "wool/process": {
     "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
+    "constraint": "0.0.0 <= v < 1.0.0"
+  },
+  "wool/request": {
+    "version": "0.0.0",
+    "constraint": "0.0.0 <= v < 1.0.0"
   },
   "wool/semver": {
     "version": "0.0.0",

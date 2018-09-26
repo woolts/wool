@@ -3,6 +3,7 @@ import * as colors from 'wool/colors';
 import * as cliQuestions from 'wool/cli-questions';
 import * as semver from 'wool/semver';
 import {
+  WoolCommonConfig,
   localPackagesUrl,
   readActivePackageConfig,
   readActivePackageLock,
@@ -50,7 +51,7 @@ const toSentence = array => {
   return array.slice(0, -1).join(', ') + ' and ' + array[array.length - 1];
 };
 
-const resolveSpecifier = async (woolConfig, name) => {
+const resolveSpecifier = async (woolConfig, name): WoolCommonConfig => {
   // z. If this is a directory, remove the existing version and install it directly
   // if (specifier === '.') {
   //   // TODO: all directories
@@ -94,7 +95,10 @@ const resolveSpecifier = async (woolConfig, name) => {
     const maxVersionConfig = await readPackageConfig(
       new URL(`${name}/${maxVersion}/`, localPackagesUrl),
     );
-    dependencies = Object.keys(maxVersionConfig.dependencies);
+    dependencies = [
+      ...Object.keys(maxVersionConfig.dependencies.direct || {}),
+      ...Object.keys(maxVersionConfig.dependencies.indirect || {}),
+    ];
   }
 
   // c. If specifier found, gather into collection of found specifiers
@@ -108,15 +112,34 @@ const resolveSpecifier = async (woolConfig, name) => {
   };
 };
 
-const resolveSpecifierRecursively = async (woolConfig, name) => {
+const resolveSpecifierRecursively = async (
+  woolConfig: WoolCommonConfig,
+  name,
+) => {
   const self = await resolveSpecifier(woolConfig, name);
   return resolveSpecifiers(woolConfig, self.dependencies, [self]);
 };
 
-const resolveSpecifiers = (woolConfig, specifiers, init = []) =>
-  specifiers
+const resolveSpecifiers = async (woolConfig, specifiers, init = []) => {
+  const ss = await specifiers
     .map(specifier => resolveSpecifierRecursively(woolConfig, specifier))
     .reduce(async (acc, next) => [...(await acc), ...(await next)], init);
+
+  // TODO: memoise specifier lookup
+  // TODO: don't duplicate a direct into indirect
+
+  // TODO: do better
+  return ss.reduce((acc, next) => {
+    let exists = false;
+    acc.forEach(s => {
+      if (s.name === next.name) {
+        exists = true;
+      }
+    });
+    if (!exists) return acc.concat(next);
+    return acc;
+  }, []);
+};
 
 export default async function add({ args, options }) {
   // TODO: use all names

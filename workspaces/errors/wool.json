@@ -2,6 +2,8 @@
   "name": "wool/errors",
   "entry": "index.ts",
   "dependencies": {
-    "wool/colors": "0.0.0 <= v < 0.0.0"
+    "direct": {
+      "wool/colors": "0.0.0 <= v < 0.0.0"
+    }
   }
 }

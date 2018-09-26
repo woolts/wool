@@ -11,6 +11,7 @@
     "workspaces/semver",
     "workspaces/errors",
     "workspaces/utils",
+    "workspaces/request",
     "workspaces/cli"
   ]
 }
