@@ -1,3 +1,5 @@
+export type Version = string;
+
 export const PATCH = 0;
 export const MINOR = 1;
 export const MAJOR = 2;
@@ -11,7 +13,7 @@ export function toConstraint(min, max) {
   return `${min} <= v < ${max}`;
 }
 
-export function toSafeConstraintFromVersion(version) {
+export function toSafeConstraintFromVersion(version: Version) {
   const { major, minor, patch } = splitVersion(version);
   return toConstraint(
     joinVersion(major, minor, patch),
@@ -25,7 +27,7 @@ export function fromConstraint(constraint) {
   return { min, max };
 }
 
-export function satisfies(constraint, version) {
+export function satisfies(constraint, version: Version) {
   const { min, max } = fromConstraint(constraint);
 
   const v = splitVersion(version);
@@ -41,7 +43,7 @@ export function satisfies(constraint, version) {
 }
 
 // Version
-export function increment(version, level = PATCH) {
+export function increment(version: Version, level = PATCH) {
   const v = splitVersion(version);
 
   if (level === MAJOR) {
@@ -55,7 +57,7 @@ export function increment(version, level = PATCH) {
   return `${v.major}.${v.minor}.${v.patch + 1}`;
 }
 
-export function splitVersion(version) {
+export function splitVersion(version: Version) {
   if (typeof version !== 'string') {
     throw new Error(`Cannot split version as it is not a string: ${version}`);
   }
@@ -71,7 +73,7 @@ export function joinVersion(major, minor, patch) {
   return `${major}.${minor}.${patch}`;
 }
 
-export function findMaxVersion(versions) {
+export function findMaxVersion(versions: Array<Version>) {
   const splits = versions.map(splitVersion);
   let max = { major: 0, minor: 0, patch: 0 };
   splits.forEach(({ major, minor, patch }) => {

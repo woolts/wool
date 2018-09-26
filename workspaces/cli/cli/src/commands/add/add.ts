@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as colors from 'wool/colors';
 import * as cliQuestions from 'wool/cli-questions';
+import request from 'wool/request';
 import * as semver from 'wool/semver';
 import {
   WoolCommonConfig,
@@ -28,7 +29,7 @@ const searchLocalPackages = name => {
   const [searchNamespace, searchPackage] = name.split('/');
 
   const namespaces = fs.readdirSync(localPackagesUrl);
-  if (!namespaces.includes(searchNamespace)) return;
+  if (!namespaces.includes(searchNamespace)) return {};
 
   const packageUrl = new URL(
     `./${searchNamespace}/${searchPackage}`,
@@ -73,22 +74,56 @@ const resolveSpecifier = async (woolConfig, name): WoolCommonConfig => {
   const localVersions = searchLocalPackages(name);
   const registryVersions = {};
 
-  (woolConfig.registries || []).forEach(registry => {
-    registryVersions[registry] = {};
-    // i. http request, search registry for name, get versions
-  });
+  await Promise.all(
+    (woolConfig.registries || []).map(async registry => {
+      registryVersions[registry] = [];
+      // i. http request, search registry for name, get versions
+      await request(`${registry}/packages/${name}`).then(res => {
+        if (res.status !== 200) return;
+
+        const body = JSON.parse(res.body);
+        if (body.versions) {
+          registryVersions[registry] = body.versions;
+        }
+      });
+    }),
+  );
 
   // b. Find the highest version that satisifies the constraints
   const objectValues = obj => Object.keys(obj).map(key => obj[key]);
   const possibleVersions = [
     ...Object.keys(localVersions),
     ...objectValues(registryVersions).reduce(
-      (acc, registry) => [...acc, ...Object.keys(registry)],
+      (acc, versions) => [...acc, ...versions],
       [],
     ),
   ];
   const maxVersion = semver.findMaxVersion(possibleVersions);
   const constraint = semver.toSafeConstraintFromVersion(maxVersion);
+
+  const locationMaxVersions = [
+    {
+      location: 'local',
+      version:
+        Object.keys(localVersions).length > 0
+          ? semver.findMaxVersion(Object.keys(localVersions))
+          : false,
+    },
+    ...Object.keys(registryVersions).map(registry => ({
+      location: registry,
+      version:
+        registryVersions[registry].length > 0
+          ? semver.findMaxVersion(registryVersions[registry])
+          : false,
+    })),
+  ];
+
+  let maxVersionFrom = 'local';
+  locationMaxVersions.forEach(({ location, version }) => {
+    if (version === maxVersion) {
+      maxVersionFrom = location;
+    }
+  });
 
   let dependencies = [];
   if (Object.keys(localVersions).includes(maxVersion)) {
@@ -106,6 +141,7 @@ const resolveSpecifier = async (woolConfig, name): WoolCommonConfig => {
     name,
     constraint,
     maxVersion,
+    maxVersionFrom,
     dependencies,
     localVersions,
     registryVersions,
@@ -185,7 +221,11 @@ export default async function add({ args, options }) {
   );
   console.log('');
   plan.forEach(dep => {
-    console.log(`    ${colors.cyan(dep.name)}  ${colors.blue(dep.constraint)}`);
+    console.log(
+      `    ${colors.cyan(dep.name)}  ${colors.blue(
+        dep.constraint,
+      )}  ${colors.white(dep.maxVersionFrom)}`,
+    );
   });
   console.log('');
   console.log(`Adding a total of ${colors.white('?kb')} to your dependencies.`);
