@@ -3,7 +3,7 @@
 - [x] Compile with typescript using `wool make ...`
 - [ ] Bundle into an installable executable
   - `pkg` is the best option
-  -
+  - However it critically does not support esm loaders
 - [x] Add `direct` and `indirect` groupings to dependencies
 - [ ] Automatically fix order of workspaces so they build in the correct order, based on the dependency graph
 - [ ] Embed a specific node version into `wool`
@@ -12,3 +12,6 @@
 - [ ] Spike using `deno` instead of node
   - It is _very_ early days so no need to do this yet
 - [ ] Change exec of \*nix specific tools to a compatibility layer to make it work on windows as well
+- [ ] Reduce node api surface
+  - May be controversial, but would help if there is a switch to deno perhaps
+  - e.g. `import { path } from 'wool/node';

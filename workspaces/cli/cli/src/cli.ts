@@ -1,6 +1,7 @@
 import run from 'wool/cli-args';
 
 import add from './commands/add';
+import init from './commands/init';
 import list from './commands/list';
 // import local from './commands/local';
 import make from './commands/make';
@@ -15,6 +16,7 @@ const app = {
   version: '0.0.0',
   commands: [
     add,
+    init,
     list,
     // local,
     make,

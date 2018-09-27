@@ -52,7 +52,7 @@ const toSentence = array => {
   return array.slice(0, -1).join(', ') + ' and ' + array[array.length - 1];
 };
 
-const resolveSpecifier = async (woolConfig, name): WoolCommonConfig => {
+const resolveSpecifier = async (woolConfig, name): Promise<any> => {
   // z. If this is a directory, remove the existing version and install it directly
   // if (specifier === '.') {
   //   // TODO: all directories

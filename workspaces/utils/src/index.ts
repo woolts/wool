@@ -3,8 +3,8 @@ import * as path from 'path';
 import { promisify } from 'util';
 import { catalogue as errors } from 'wool/errors';
 
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
+export const readFile = promisify(fs.readFile);
+export const writeFile = promisify(fs.writeFile);
 
 // Paths
 export const woolPath = process.env.WOOL_PATH;
