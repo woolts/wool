@@ -79,35 +79,101 @@ export const get = curry((k: string, x: object) => {
 });
 
 export const find = curry(function find<X>(
-  fn: Function,
+  predicate: Predicate<X>,
   xs: Array<X> | undefined,
 ): X | boolean {
   if (xs === undefined) return false;
+  const predicateFn = createPredicate(predicate);
   for (let x of xs) {
-    if (fn(x)) return x;
+    if (predicateFn(x)) return x;
   }
   return false;
 });
 
 export const findOr = curry(function findOr<X, Y>(
-  fn: Function,
+  predicate: Predicate<X>,
   or: Y,
   xs: Array<X> | undefined,
 ): X | Y {
   if (xs === undefined) return or;
+  const predicateFn = createPredicate(predicate);
   for (let x of xs) {
-    if (fn(x)) return x;
+    if (predicateFn(x)) return x;
   }
   return or;
 });
 
 export const some = curry(function some<X>(
-  fn: Function,
+  predicate: Function,
   xs: Array<X> | undefined,
 ): boolean {
   if (xs === undefined) return false;
+  const predicateFn = createPredicate(predicate);
   for (let x of xs) {
-    if (fn(x)) return true;
+    if (predicateFn(x)) return true;
   }
   return false;
 });
+
+export function unique<X>(xs: Array<X>): Array<X> {
+  return xs.filter((x, i) =>
+    [...xs.slice(0, i), ...xs.slice(i + 1)].includes(x),
+  );
+}
+
+export const uniqueBy = curry(function uniqueBy<X, Y>(
+  iteratee: Iteratee<X, Y>,
+  xs: Array<X>,
+): Array<X> {
+  const mapped = xs.map(createIteratee(iteratee));
+  const duplicateIndices = xs.reduce((acc, _, i) => {
+    const isDuplicate = [
+      ...mapped.slice(0, i),
+      ...mapped.slice(i + 1),
+    ].includes(mapped[i]);
+    return isDuplicate ? acc.concat(i) : acc;
+  }, []);
+  return xs.filter((_, i) => !duplicateIndices.includes(i));
+});
+
+// --- Predicate ---
+
+type Predicate<X> = PredicateFn<X> | Matches | MatchesProperty | Property;
+type PredicateFn<X> = (x: X) => boolean;
+type Matches = { [key: string]: any };
+type MatchesProperty = [string, any];
+type Property = string;
+
+// @private
+function createPredicate<X>(predicate: Predicate<X>): (x: X) => boolean {
+  if (typeof predicate === 'function') return predicate;
+
+  if (typeof predicate === 'object') {
+    return (x: X) => {
+      let matches = true;
+      Object.keys(predicate).forEach(key => {
+        matches = matches && x[key] === predicate[key];
+      });
+      return matches;
+    };
+  }
+
+  if (Array.isArray(predicate)) {
+    return (x: X) => x[predicate[0]] === predicate[1];
+  }
+
+  if (typeof predicate === 'string') {
+    return (x: X) => Boolean(x[predicate]);
+  }
+}
+
+// --- Iteratee ---
+
+type Iteratee<X, Y> = (x: X) => Y | string;
+
+// @private
+function createIteratee<X, Y>(iteratee: Iteratee<X, Y>) {
+  if (typeof iteratee === 'function') return iteratee;
+  if (typeof iteratee === 'string') (x: X) => x[iteratee] as Y;
+  throw new Error(`Iteratee must be a function or string, given '${iteratee}'`);
+}
