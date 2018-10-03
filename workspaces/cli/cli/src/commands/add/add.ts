@@ -1,22 +1,29 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as colors from 'wool/colors';
 import * as cliQuestions from 'wool/cli-questions';
 import request from 'wool/request';
 import * as semver from 'wool/semver';
 import {
   WoolCommonConfig,
+  findOr,
+  get,
+  localPackagesPath,
   localPackagesUrl,
+  map,
   readActivePackageConfig,
   readActivePackageLock,
   readPackageConfig,
   readPackageLock,
+  some,
   writeActivePackageConfig,
   writeActivePackageLock,
   writePackageConfig,
   writePackageLock,
   woolPath,
 } from 'wool/utils';
-import { stringify } from 'querystring';
+
+import { multiSpinner } from '../spinners';
 
 const isValidName = specifier => {
   // https://regex101.com/r/s7UWNw/1
@@ -74,18 +81,21 @@ const resolveSpecifier = async (woolConfig, name): Promise<any> => {
   const localVersions = searchLocalPackages(name);
   const registryVersions = {};
 
+  // TODO: add spinner for searching registries
+
   await Promise.all(
     (woolConfig.registries || []).map(async registry => {
       registryVersions[registry] = [];
       // i. http request, search registry for name, get versions
-      await request(`${registry}/packages/${name}`).then(res => {
-        if (res.status !== 200) return;
+      await request(`${registry}/packages/${name}`, { json: true }).then(
+        res => {
+          if (res.statusCode !== 200) return;
 
-        const body = JSON.parse(res.body);
-        if (body.versions) {
-          registryVersions[registry] = body.versions;
-        }
-      });
+          if (res.body.versions) {
+            registryVersions[registry] = res.body.versions;
+          }
+        },
+      );
     }),
   );
 
@@ -94,7 +104,7 @@ const resolveSpecifier = async (woolConfig, name): Promise<any> => {
   const possibleVersions = [
     ...Object.keys(localVersions),
     ...objectValues(registryVersions).reduce(
-      (acc, versions) => [...acc, ...versions],
+      (acc, versions) => [...acc, ...map(get('number'), versions)],
       [],
     ),
   ];
@@ -113,17 +123,23 @@ const resolveSpecifier = async (woolConfig, name): Promise<any> => {
       location: registry,
       version:
         registryVersions[registry].length > 0
-          ? semver.findMaxVersion(registryVersions[registry])
+          ? semver.findMaxVersion(
+              map(get('number'), registryVersions[registry]),
+            )
           : false,
     })),
   ];
 
-  let maxVersionFrom = 'local';
-  locationMaxVersions.forEach(({ location, version }) => {
-    if (version === maxVersion) {
-      maxVersionFrom = location;
-    }
-  });
+  const maxVersionFrom = (findOr(
+    ({ version }) => version === maxVersion,
+    { location: 'local' } as any,
+    locationMaxVersions,
+  ) as any).location;
+  const maxVersionSize = (findOr(
+    ({ number }) => number === maxVersion,
+    { size: null } as any,
+    registryVersions[maxVersionFrom],
+  ) as any).size;
 
   let dependencies = [];
   if (Object.keys(localVersions).includes(maxVersion)) {
@@ -142,6 +158,7 @@ const resolveSpecifier = async (woolConfig, name): Promise<any> => {
     constraint,
     maxVersion,
     maxVersionFrom,
+    maxVersionSize,
     dependencies,
     localVersions,
     registryVersions,
@@ -228,7 +245,28 @@ export default async function add({ args, options }) {
     );
   });
   console.log('');
-  console.log(`Adding a total of ${colors.white('?kb')} to your dependencies.`);
+
+  const totalSize = plan.reduce(
+    (sum, dep) => sum + (dep.maxVersionSize || 0),
+    0,
+  );
+  const hasUnknown = some(dep => dep.maxVersionSize === null, plan);
+
+  if (hasUnknown) {
+    console.log(
+      `Adding at least ${colors.white(
+        `${formatSize(totalSize)}`,
+      )} to your dependencies, ${colors.yellow(
+        'though the total is unknown',
+      )}.`,
+    );
+  } else {
+    console.log(
+      `Adding a total of ${colors.white(
+        `${formatSize(totalSize)}`,
+      )} to your dependencies.`,
+    );
+  }
   console.log('');
   const { confirmInstall }: any = await cliQuestions.ask([
     {
@@ -245,6 +283,8 @@ export default async function add({ args, options }) {
   }
 
   // b. If user accepts plan, install packages into $WOOL_HOME and update wool.json
+
+  // b.i. Update wool.json & wool.lock
   const keyedPlan = {};
   const newDependencies = woolConfig.dependencies || {};
   newDependencies.direct = newDependencies.direct || {};
@@ -302,11 +342,62 @@ export default async function add({ args, options }) {
     await writeActivePackageLock(newLock);
   }
 
-  console.log(colors.green('Installed.'));
+  // b.ii. Download and unpack new packages
+  const pendings = [];
+
+  await Promise.all(
+    plan.map(async dep => {
+      const localVersionPath = path.join(
+        localPackagesPath,
+        dep.name,
+        newLock[dep.name].version,
+      );
+      await readPackageConfig(localVersionPath).catch(err => {
+        // TODO: Download and unzip
+        pendings.push(
+          new Promise(resolve =>
+            setTimeout(resolve, 1000 + Math.random() * 1000),
+          ),
+        );
+      });
+    }),
+  );
+
+  const spinnersInterval = multiSpinner(
+    pendings,
+    index => {
+      const name = plan[index].name;
+      return `⏬ Downloading ${colors.cyan(name)} at ${colors.blue(
+        newLock[name].version,
+      )}`;
+    },
+    index => {
+      const name = plan[index].name;
+      return `✅ Downloaded ${colors.cyan(name)} at ${colors.blue(
+        newLock[name].version,
+      )}`;
+    },
+  );
+
+  await Promise.all(pendings)
+    .then(() => new Promise(resolve => setTimeout(resolve, 80)))
+    .then(() => {
+      clearInterval(spinnersInterval);
+    });
+
   console.log('');
   console.log(
-    `${woolPath} usage ${colors.magenta('increased')} by ${colors.magenta(
-      '?kb',
-    )} to ${colors.white('?mb')}`,
+    `Installed packages ${colors.magenta('increased')} by ${colors.magenta(
+      formatSize(totalSize),
+    )} to ${colors.white(formatSize(0))}.`,
   );
+  console.log(`Run ${colors.blue('wool stats')} for more information.`);
+}
+
+function formatSize(size: number): string {
+  if (size < 1024) {
+    return `${size} bytes`;
+  }
+
+  return `${Math.round(size / 102.4) / 10}kb`;
 }

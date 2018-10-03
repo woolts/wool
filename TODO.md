@@ -14,4 +14,9 @@
 - [ ] Change exec of \*nix specific tools to a compatibility layer to make it work on windows as well
 - [ ] Reduce node api surface
   - May be controversial, but would help if there is a switch to deno perhaps
-  - e.g. `import { path } from 'wool/node';
+  - e.g. `import { path } from 'wool/node';`
+  - or `import { path } from 'wool';`
+  - or `import { path } from 'node/path';`
+- [ ] Catch all errors and map through sourcemaps to ts code
+- [ ] Add `wool stats` (tbd) for stats on installed packages
+- [ ] Suppress esm experimental warning (not any others)

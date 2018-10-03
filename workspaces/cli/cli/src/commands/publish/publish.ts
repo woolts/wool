@@ -1,9 +1,11 @@
 import * as path from 'path';
 import * as colors from 'wool/colors';
 import { catalogue as errors } from 'wool/errors';
+import request from 'wool/request';
 import { exec, spawn } from 'wool/process';
 import { readPackageConfig, resolveWorkspaces, woolPath } from 'wool/utils';
 
+import { multiSpinner } from '../spinners';
 import make from '../make/make';
 import pack from '../pack/pack';
 
@@ -41,11 +43,10 @@ export default async function publish({ args, options }) {
   await Promise.all(
     Object.keys(workspaces).map(async name => {
       const pkg = workspaces[name];
-      await exec(
-        `curl ${config.registries[0]}/packages/${name}/${pkg.version}`,
+      await request(
+        `${config.registries[0]}/packages/${name}/${pkg.version}`,
       ).then(res => {
-        // TODO: have a better way to checking the status
-        if (res === '404') {
+        if (res.statusCode === 404) {
           unpublished[name] = pkg;
         } else {
           published[name] = pkg;
@@ -74,37 +75,6 @@ export default async function publish({ args, options }) {
   console.log('');
 
   const pendings = [];
-  const completes = [];
-  // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-  let frame = 0;
-  let first = true;
-
-  // https://stackoverflow.com/a/34848607
-  const spinnersInterval = setInterval(() => {
-    if (!first) {
-      process.stdout.write(`\u001B[${Object.keys(unpublished).length}A`);
-    }
-    first = false;
-    pendings.forEach((pending, i) => {
-      const name = Object.keys(unpublished)[i];
-      if (completes.includes(name)) {
-        process.stdout.write(
-          `🛳  Published ${colors.cyan(name)} to ${colors.magenta(
-            config.registries[0],
-          )}\n`,
-        );
-      } else {
-        process.stdout.write(
-          `${colors.magenta(frames[frame])} Publishing ${colors.cyan(
-            name,
-          )} to ${colors.magenta(config.registries[0])}\n`,
-        );
-      }
-    });
-    frame++;
-    frame = frame % frames.length;
-  }, 80);
 
   Object.keys(unpublished).forEach(name => {
     const pkg = unpublished[name];
@@ -121,18 +91,25 @@ export default async function publish({ args, options }) {
       spawn('rsync', [
         bundlePath.replace(process.cwd(), '.'),
         path.join(woolPath, 'registries/example/packages/'),
-      ])
-        .then(
-          () =>
-            new Promise(resolve =>
-              setTimeout(resolve, Math.random() * 1000 + 1000),
-            ),
-        )
-        .then(() => {
-          completes.push(name);
-        }),
+      ]),
     );
   });
+
+  const spinnersInterval = multiSpinner(
+    pendings,
+    index => {
+      const name = Object.keys(unpublished)[index];
+      return `Publishing ${colors.cyan(name)} to ${colors.magenta(
+        config.registries[0],
+      )}`;
+    },
+    index => {
+      const name = Object.keys(unpublished)[index];
+      return `🛳  Published ${colors.cyan(name)} to ${colors.magenta(
+        config.registries[0],
+      )}`;
+    },
+  );
 
   await Promise.all(pendings)
     .then(() => new Promise(resolve => setTimeout(resolve, 80)))

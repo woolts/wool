@@ -7,6 +7,8 @@ import {
   readActivePackageLock,
 } from 'wool/utils';
 
+const IGNORE_FILES = ['.DS_Store'];
+
 export default async function run({ options }) {
   let config;
   try {
@@ -76,7 +78,9 @@ function listGlobal() {
     'These are the packages installed and available on your system:\n',
   );
 
-  const namespaces = fs.readdirSync(localPackagesPath);
+  const namespaces = fs
+    .readdirSync(localPackagesPath)
+    .filter(n => !IGNORE_FILES.includes(n));
   namespaces.forEach(namespace => {
     console.log(`  ${colors.white(namespace)}`);
 
