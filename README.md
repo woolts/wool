@@ -212,6 +212,12 @@ Use `--offline` to only look for the package in the existing installed packages,
 
 Use `--fresh` to ignore the `wool.lock` and search for the package online in registry order.
 
+Use `--workspace` / `-w` to add the package into a specific workspace other than the current directory.
+
+```
+wool add lsjroberts/package -w workspaces/example
+```
+
 **Add a global dependency** (todo)
 
 ```
