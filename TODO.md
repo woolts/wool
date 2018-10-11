@@ -20,3 +20,6 @@
 - [ ] Catch all errors and map through sourcemaps to ts code
 - [ ] Add `wool stats` (tbd) for stats on installed packages
 - [ ] Suppress esm experimental warning (not any others)
+- [ ] Fix `wool.lock` to include direct and indirect deps from parent workspace
+- [ ] Rename `wool.lock` to `wool-lock.json` since it is a json file
+- [ ] Fix `wool add` to handle down registries

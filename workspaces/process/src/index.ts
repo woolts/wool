@@ -16,7 +16,7 @@ export const spawn = (command: string, args?: Array<string>, options?: any) => {
     console.log(
       colors.gray('spawn ::'),
       colors.gray(command),
-      colors.gray(args),
+      colors.gray(args.join(' ')),
     );
   }
   const withDefaults = { stdio: 'inherit', ...options };

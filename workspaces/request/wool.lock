@@ -3,7 +3,15 @@
     "version": "0.0.0",
     "constraint": "0.0.0 <= v < 1.0.0"
   },
+  "wool/errors": {
+    "version": "0.0.0",
+    "constraint": "0.0.0 <= v < 1.0.0"
+  },
   "wool/process": {
+    "version": "0.0.0",
+    "constraint": "0.0.0 <= v < 1.0.0"
+  },
+  "wool/utils": {
     "version": "0.0.0",
     "constraint": "0.0.0 <= v < 1.0.0"
   }

@@ -39,12 +39,12 @@ function message(string) {
   let chars = 0;
   words.forEach(word => {
     const normalised = word.replace(/\\u001B\[[0-9]{2}m/g, '');
-    chars += normalised.length;
+    chars += normalised.length + 1;
     if (chars < WIDTH) {
       wrapped.push(word);
     } else {
       wrapped.push(`\n${word.replace(' ', '')}`);
-      chars = normalised.length;
+      chars = normalised.length + 1;
     }
   });
   return wrapped.join(' ');

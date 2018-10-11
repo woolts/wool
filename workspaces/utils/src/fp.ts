@@ -56,26 +56,22 @@ export function curry(fn: Function): Function {
   return fn.apply(null, Array.prototype.slice.call(arguments, 1));
 }
 
-export const map = curry(function map<X>(
-  fn: (value: X, index: number) => Array<any>,
-  xs: Array<X> | object,
-): Array<any> {
-  if (Array.isArray(xs)) return xs.map(fn);
-  if (typeof xs === 'object') return map(fn, Object.values(xs));
-});
-
-export const pick = curry((ks: string | Array<string>, x: object) => {
-  const out = {};
-  Object.keys(x).forEach(k => {
-    if ((typeof ks === 'string' && k === ks) || ks.includes(k)) {
-      out[k] = x[k];
+export const bisect = curry(function bisect<X>(
+  predicate: Predicate<X>,
+  xs: Array<X> | undefined,
+): [Array<X>, Array<X>] {
+  const left = [];
+  const right = [];
+  if (xs === undefined) return [left, right];
+  const predicateFn = createPredicate(predicate);
+  for (let x of xs) {
+    if (predicateFn(x)) {
+      left.push(x);
+    } else {
+      right.push(x);
     }
-  });
-  return out;
-});
-
-export const get = curry((k: string, x: object) => {
-  return x[k];
+  }
+  return [left, right];
 });
 
 export const find = curry(function find<X>(
@@ -103,6 +99,55 @@ export const findOr = curry(function findOr<X, Y>(
   return or;
 });
 
+export const get = curry((k: string, x: object) => {
+  return x[k];
+});
+
+export const has = curry((k: string, x: object) => {
+  return x[k] !== undefined;
+});
+
+export const map = curry(function map<X, Y>(
+  iteratee: Iteratee<X, Y>,
+  xs: Array<X> | object,
+): Array<Y> {
+  const iterateeFn = createIteratee(iteratee);
+  if (Array.isArray(xs)) return xs.map(iterateeFn);
+  if (typeof xs === 'object') return map(iterateeFn, Object.values(xs));
+});
+
+export const padLeft = curry((char: string, len: number, str: string) => {
+  if (str.length >= len) return str;
+  const pad = range(0, len - str.length)
+    .map(() => char)
+    .join('');
+  return pad + str;
+});
+
+export const padRight = curry((char: string, len: number, str: string) => {
+  if (str.length >= len) return str;
+  const pad = range(0, len - str.length)
+    .map(() => char)
+    .join('');
+  return str + pad;
+});
+
+export const pick = curry((ks: string | Array<string>, x: object) => {
+  const out = {};
+  Object.keys(x).forEach(k => {
+    if ((typeof ks === 'string' && k === ks) || ks.includes(k)) {
+      out[k] = x[k];
+    }
+  });
+  return out;
+});
+
+export const range = (from: number, to?: number) => {
+  const from_ = to ? from : 0;
+  const to_ = to || from;
+  return new Array(to_ - from_).fill(0).map((_, i) => i + from);
+};
+
 export const some = curry(function some<X>(
   predicate: Function,
   xs: Array<X> | undefined,
@@ -125,7 +170,7 @@ export const uniqueBy = curry(function uniqueBy<X, Y>(
   iteratee: Iteratee<X, Y>,
   xs: Array<X>,
 ): Array<X> {
-  const mapped = xs.map(createIteratee(iteratee));
+  const mapped = map(iteratee, xs);
   const duplicateIndices = xs.reduce((acc, _, i) => {
     const isDuplicate = [
       ...mapped.slice(0, i),
@@ -169,11 +214,17 @@ function createPredicate<X>(predicate: Predicate<X>): (x: X) => boolean {
 
 // --- Iteratee ---
 
-type Iteratee<X, Y> = (x: X) => Y | string;
+type Iteratee<X, Y> = (x: X, index: number) => Y | string;
 
 // @private
-function createIteratee<X, Y>(iteratee: Iteratee<X, Y>) {
-  if (typeof iteratee === 'function') return iteratee;
-  if (typeof iteratee === 'string') (x: X) => x[iteratee] as Y;
+function createIteratee<X, Y>(
+  iteratee: Iteratee<X, Y>,
+): (x: X, index: number) => Y {
+  if (typeof iteratee === 'function') {
+    return iteratee as (x: X, index: number) => Y;
+  }
+  if (typeof iteratee === 'string') {
+    return (x: X, index: number) => x[iteratee] as Y;
+  }
   throw new Error(`Iteratee must be a function or string, given '${iteratee}'`);
 }

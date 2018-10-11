@@ -40,9 +40,15 @@ interface WoolWorkspaceConfig extends WoolCommonConfig {
 export type WoolConfig = any;
 
 export interface WoolLock {
-  [key: string]: {
-    version: string;
-  };
+  [key: string]: ResolvedSpecifier;
+}
+
+export interface ResolvedSpecifier {
+  name: string;
+  version: string;
+  constraint: string;
+  registry: string;
+  size: number;
 }
 
 export const readPackageConfig = (url: URL | string): Promise<WoolConfig> =>

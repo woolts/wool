@@ -1,12 +1,14 @@
 {
   "name": "wool/request",
-  "entry": "src/index.ts",
+  "entry": "src/request.ts",
   "dependencies": {
     "direct": {
-      "wool/process": "0.0.0 <= v < 1.0.0"
+      "wool/process": "0.0.0 <= v < 1.0.0",
+      "wool/utils": "0.0.0 <= v < 1.0.0"
     },
     "indirect": {
-      "wool/colors": "0.0.0 <= v < 1.0.0"
+      "wool/colors": "0.0.0 <= v < 1.0.0",
+      "wool/errors": "0.0.0 <= v < 1.0.0"
     }
   }
 }

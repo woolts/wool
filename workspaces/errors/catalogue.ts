@@ -8,6 +8,7 @@ import format from './format';
 const readFile = promisify(fs.readFile);
 
 export default {
+  addUnresolvedPackage,
   makeMissingWoolConfig,
   makeTypescriptMissingModuleError,
   makeTypescriptGenericError,
@@ -16,6 +17,32 @@ export default {
   readPackageConfig,
   readPackageLock,
 };
+
+// --- Add ---
+
+function addUnresolvedPackage({ unresolved }) {
+  const unresolvedMessages = unresolved.map(u =>
+    colors.red(`    ${u.name}  required by ${u.parent}  at ${u.constraint}`),
+  );
+
+  return [
+    format.title('Resolution error', 'wool add'),
+    '',
+    format.message(
+      'I could not resolve some of the packages you requested and/or their dependencies.',
+    ),
+    '',
+    ...unresolvedMessages,
+    '',
+    format.message(
+      'This is either an issue with one or more of the published packages, or with wool itself.',
+    ),
+    '',
+    format.message(
+      'Please report this issue to https://github.com/woolts/wool/issues',
+    ),
+  ].join('\n');
+}
 
 // --- Make ---
 

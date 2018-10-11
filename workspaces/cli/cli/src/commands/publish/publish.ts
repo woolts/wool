@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as colors from 'wool/colors';
 import { catalogue as errors } from 'wool/errors';
-import request from 'wool/request';
+import { request } from 'wool/request';
 import { exec, spawn } from 'wool/process';
 import { readPackageConfig, resolveWorkspaces, woolPath } from 'wool/utils';
 
@@ -44,9 +44,9 @@ export default async function publish({ args, options }) {
     Object.keys(workspaces).map(async name => {
       const pkg = workspaces[name];
       await request(
-        `${config.registries[0]}/packages/${name}/${pkg.version}`,
+        `${config.registries[0]}/packages/${name}/${pkg.version}/bundle`,
       ).then(res => {
-        if (res.statusCode === 404) {
+        if (res.statusCode !== 200) {
           unpublished[name] = pkg;
         } else {
           published[name] = pkg;
@@ -72,6 +72,7 @@ export default async function publish({ args, options }) {
   await pack({ args: { dir: args.dir }, options: {} });
 
   // 6. rsync it up to the registry
+  // TODO: update the registry packages.json list
   console.log('');
 
   const pendings = [];
@@ -90,12 +91,13 @@ export default async function publish({ args, options }) {
     pendings.push(
       spawn('rsync', [
         bundlePath.replace(process.cwd(), '.'),
-        path.join(woolPath, 'registries/example/packages/'),
+        // TODO: don't hardcode 'example'
+        path.join(woolPath, 'registries/example/bundles/'),
       ]),
     );
   });
 
-  const spinnersInterval = multiSpinner(
+  multiSpinner(
     pendings,
     index => {
       const name = Object.keys(unpublished)[index];
@@ -111,9 +113,5 @@ export default async function publish({ args, options }) {
     },
   );
 
-  await Promise.all(pendings)
-    .then(() => new Promise(resolve => setTimeout(resolve, 80)))
-    .then(() => {
-      clearInterval(spinnersInterval);
-    });
+  await Promise.all(pendings);
 }
