@@ -23,3 +23,13 @@
 - [ ] Fix `wool.lock` to include direct and indirect deps from parent workspace
 - [ ] Rename `wool.lock` to `wool-lock.json` since it is a json file
 - [ ] Fix `wool add` to handle down registries
+- [ ] Add `wool add npm/example` to install npm packages with caveats
+  - Only in private packages
+- [ ] Add a `wool-stats.json` to store compilation info
+- [ ] When running `wool run` check for missing dependencies, run a `wool make .` if required and a `wool add ...` for the remaining non-local deps
+- [ ] Change global add to `wool install wool/cli`
+  - [ ] And `wool install wool/cli -v 0.2.0`
+- [ ] Add generic run configs, `wool run -c example.json lsjroberts/example`
+- [ ] `wool run` should run the version that matches the local dep unless version specified
+- [ ] Add `tasks` for `wool task build` from `{ "tasks": { "build": "do thing" } }`
+  - [ ] With built-in nesting, `wool task build.web` from `{ "tasks": { "build": { "web": "do web" } } }`, and `wool task build` would run all nested tasks.

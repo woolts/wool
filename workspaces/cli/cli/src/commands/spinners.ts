@@ -3,9 +3,39 @@ import { padRight } from 'wool/utils';
 
 // TODO: spinners should be on the stderr, used for messaging not output
 
-export function spinner(promise, pendingMessage, completeMessage) {
-  // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+// https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
+const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+
+let singletonInterval;
+
+export function startSpinner(message: () => string) {
+  let frame = 0;
+  let first = false;
+
+  singletonInterval = setInterval(() => {
+    if (!first) {
+      clearLines(1);
+    }
+    first = false;
+    writeLine(`${colors.magenta(frames[frame])} ${message()}`);
+
+    frame++;
+    frame = frame % frames.length;
+  }, 80);
+}
+
+export function stopSpinner(message: () => string) {
+  clearLines(1);
+  writeLine(message());
+  console.log('');
+  clearInterval(singletonInterval);
+}
+
+export function spinner<X>(
+  promise: Promise<X>,
+  pendingMessage: () => string,
+  completeMessage: (value: X) => string,
+) {
   let frame = 0;
 
   let first = true;
@@ -13,7 +43,6 @@ export function spinner(promise, pendingMessage, completeMessage) {
 
   const interval = setInterval(() => {
     if (!first) {
-      // process.stdout.write(`\u001B[1A`);
       clearLines(1);
     }
     first = false;
@@ -27,16 +56,17 @@ export function spinner(promise, pendingMessage, completeMessage) {
 
   promise.then(value => {
     complete = true;
-    // process.stdout.write(`\u001B[1A`);
     clearLines(1);
     writeLine(completeMessage(value));
     clearInterval(interval);
   });
 }
 
-export function multiSpinner(pendings, toPendingMessage, toCompleteMessage) {
-  // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+export function multiSpinner(
+  pendings: Array<Promise<any>>,
+  toPendingMessage: (index: number) => string,
+  toCompleteMessage: (index: number) => string,
+) {
   let frame = 0;
   let first = true;
 
@@ -47,7 +77,6 @@ export function multiSpinner(pendings, toPendingMessage, toCompleteMessage) {
 
   const interval = setInterval(() => {
     if (!first) {
-      // process.stdout.write(`\u001B[${Object.keys(pendings).length}A`);
       clearLines(Object.keys(pendings).length);
     }
     first = false;
@@ -67,7 +96,6 @@ export function multiSpinner(pendings, toPendingMessage, toCompleteMessage) {
   }, 80);
 
   Promise.all(pendings).then(() => {
-    // process.stdout.write(`\u001B[${Object.keys(pendings).length}A`);
     clearLines(Object.keys(pendings).length);
     pendings.forEach((_, index) => {
       writeLine(toCompleteMessage(index));

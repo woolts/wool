@@ -5,6 +5,7 @@ import * as colors from 'wool/colors';
 import { catalogue as errors } from 'wool/errors';
 import { exec } from 'wool/process';
 import {
+  dirSize,
   localPackagesPath,
   pathToUrl,
   readInstalledPackageConfig,
@@ -13,6 +14,8 @@ import {
   resolveWorkspaces,
   writePackageConfig,
 } from 'wool/utils';
+
+import { startSpinner, stopSpinner } from '../spinners';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -114,12 +117,13 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
   );
   const packageArtifactUrl = pathToUrl(packageArtifactDir);
 
-  console.log(
-    `🐑 Compiling ${colors.cyan(name)} from ${colors.white(
-      dir.replace(`${process.cwd()}/`, ''),
-    )} into ${colors.magenta(
-      packageArtifactDir.replace(`${process.cwd()}/`, ''),
-    )}`,
+  startSpinner(
+    () =>
+      `Compiling ${colors.cyan(name)} from ${colors.white(
+        dir.replace(`${process.cwd()}/`, ''),
+      )} into ${colors.magenta(
+        packageArtifactDir.replace(`${process.cwd()}/`, ''),
+      )}`,
   );
 
   if (
@@ -169,10 +173,13 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
         )}`,
       );
 
+      const compiledSize = await dirSize(dir);
+
       const artifactConfig = await readPackageConfig(packageArtifactUrl);
       await writePackageConfig(packageArtifactUrl, {
         ...artifactConfig,
         compiledAt: Date.now(),
+        compiledSize,
       });
 
       // TODO: If there is no lock file we should install the latest and inform
@@ -205,6 +212,15 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
       console.log('');
       console.log(error.message);
     });
+
+  stopSpinner(
+    () =>
+      `🐑 Compiled ${colors.cyan(name)} from ${colors.white(
+        dir.replace(`${process.cwd()}/`, ''),
+      )} into ${colors.magenta(
+        packageArtifactDir.replace(`${process.cwd()}/`, ''),
+      )}`,
+  );
 }
 
 async function tsconfigTemplate(

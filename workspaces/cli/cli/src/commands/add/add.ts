@@ -492,7 +492,6 @@ async function resolveSpecifier(
   ) as any).size;
 
   let dependencies = [];
-  // TODO: get dependencies from registries
   if (Object.keys(localVersions).includes(maxVersion)) {
     const maxVersionConfig = await readPackageConfig(
       new URL(`${name}/${maxVersion}/`, localPackagesUrl),

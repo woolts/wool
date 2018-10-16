@@ -22,6 +22,10 @@ export interface WoolCommonConfig {
       [key: string]: string;
     };
   };
+
+  // TODO: move this to wool-stats.json?
+  compiledAt?: number;
+  compiledSize?: number;
 }
 
 interface WoolPackageConfig extends WoolCommonConfig {

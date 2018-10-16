@@ -66,6 +66,7 @@ function matchArguments(expectedString, actual) {
       if (isOption(actual[index])) {
         throw new Error(`Arguments must be provided before optional flags`);
       }
+      // TODO: Support array args e.g. `<...names>`
       matched[name] = actual[index];
       return;
     }
