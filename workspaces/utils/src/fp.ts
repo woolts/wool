@@ -99,12 +99,29 @@ export const findOr = curry(function findOr<X, Y>(
   return or;
 });
 
-export const get = curry((k: string, x: object) => {
-  return x[k];
+export const get = curry((path: string | Array<string>, x: object) => {
+  const paths = Array.isArray(path) ? path : path.split('.');
+  if (paths.length === 0) {
+    throw new Error('How the heck did you get here?');
+  }
+  if (paths.length === 1) {
+    return x[paths[0]];
+  }
+  return get(paths.slice(1), x[paths[0]]);
 });
 
-export const has = curry((k: string, x: object) => {
-  return x[k] !== undefined;
+export const has = curry((path: string | Array<string>, x: object) => {
+  const paths = Array.isArray(path) ? path : path.split('.');
+  if (paths.length === 0) {
+    throw new Error('How the heck did you get here?');
+  }
+  if (paths.length === 1) {
+    return x[paths[0]] !== undefined;
+  }
+  if (x[paths[0]] === undefined) {
+    return false;
+  }
+  return has(paths.slice(1), x[paths[0]]);
 });
 
 export const map = curry(function map<X, Y>(

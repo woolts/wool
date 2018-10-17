@@ -1,9 +1,16 @@
 {
-    "private": true,
-    "workspaces": [
-      "alice/package",
-      "bob/package",
-      "lsjroberts/example",
-      "nested"
-    ]
+  "private": true,
+  "workspaces": [
+    "alice/package",
+    "bob/package",
+    "lsjroberts/example",
+    "nested"
+  ],
+  "tasks": {
+    "single": ["echo", "single"],
+    "nested": {
+      "one": ["echo", "nested.one"],
+      "two": ["echo", "nested.two"]
+    }
   }
+}

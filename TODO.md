@@ -31,5 +31,6 @@
   - [ ] And `wool install wool/cli -v 0.2.0`
 - [ ] Add generic run configs, `wool run -c example.json lsjroberts/example`
 - [ ] `wool run` should run the version that matches the local dep unless version specified
-- [ ] Add `tasks` for `wool task build` from `{ "tasks": { "build": "do thing" } }`
-  - [ ] With built-in nesting, `wool task build.web` from `{ "tasks": { "build": { "web": "do web" } } }`, and `wool task build` would run all nested tasks.
+- [x] Add `tasks` for `wool task . build` from `{ "tasks": { "build": "do thing" } }`
+  - [x] With built-in nesting, `wool task . build.web` from `{ "tasks": { "build": { "web": "do web" } } }`, and `wool task . build` would run all nested tasks.
+  - [ ] Shortcut cwd with `wool task build`

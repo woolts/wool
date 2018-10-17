@@ -22,6 +22,13 @@ export interface WoolCommonConfig {
       [key: string]: string;
     };
   };
+  tasks?: {
+    [key: string]:
+      | string
+      | {
+          [key: string]: string | { [key: string]: string };
+        };
+  };
 
   // TODO: move this to wool-stats.json?
   compiledAt?: number;
