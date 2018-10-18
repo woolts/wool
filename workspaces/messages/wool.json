@@ -1,5 +1,5 @@
 {
-  "name": "wool/errors",
+  "name": "wool/messages",
   "entry": "index.ts",
   "dependencies": {
     "direct": {

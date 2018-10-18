@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as colors from 'wool/colors';
-import { catalogue as errors } from 'wool/errors';
+import { errors } from 'wool/messages';
 import { request } from 'wool/request';
 import { exec, spawn } from 'wool/process';
 import { readPackageConfig, resolveWorkspaces, woolPath } from 'wool/utils';

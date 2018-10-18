@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import * as colors from 'wool/colors';
-import { catalogue as errors } from 'wool/errors';
+import { errors } from 'wool/messages';
 import { exec } from 'wool/process';
 import {
   dirSize,

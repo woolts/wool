@@ -16,11 +16,11 @@ function repeat(char, times) {
   return result.join('');
 }
 
-function title(label, location) {
+function title(label, location, color = colors.red) {
   let spacerCount = WIDTH - label.length - location.length - 4;
   if (spacerCount < 2) spacerCount = 2;
 
-  return colors.red(
+  return color(
     [
       '❖',
       label.toUpperCase(),
@@ -38,7 +38,8 @@ function message(string) {
   const words = string.split(' ');
   let chars = 0;
   words.forEach(word => {
-    const normalised = word.replace(/\\u001B\[[0-9]{2}m/g, '');
+    let normalised = JSON.stringify(word).replace(/\\u001B\[[0-9]{2}m/gi, '');
+    normalised = normalised.slice(1, normalised.length - 1);
     chars += normalised.length + 1;
     if (chars < WIDTH) {
       wrapped.push(word);

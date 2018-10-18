@@ -3,7 +3,7 @@
   "entry": "src/index.ts",
   "dependencies": {
     "direct": {
-      "wool/errors": "0.0.0 <= v < 1.0.0"
+      "wool/messages": "0.0.0 <= v < 1.0.0"
     }
   }
 }

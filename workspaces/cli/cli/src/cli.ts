@@ -7,9 +7,10 @@ import list from './commands/list';
 import make from './commands/make';
 import pack from './commands/pack';
 import runPrivate from './commands/run-private';
-import task from './commands/task';
 import publish from './commands/publish';
 import run from './commands/run';
+import summary from './commands/summary';
+import task from './commands/task';
 // import version from './commands/version';
 
 const app = {
@@ -25,6 +26,7 @@ const app = {
     publish,
     run,
     runPrivate,
+    summary,
     task,
     // version,
   ],

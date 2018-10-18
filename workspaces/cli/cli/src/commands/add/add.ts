@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as colors from 'wool/colors';
 import * as cliQuestions from 'wool/cli-questions';
-import { catalogue as errors } from 'wool/errors';
+import { errors } from 'wool/messages';
 import { spawn } from 'wool/process';
 import { download, request } from 'wool/request';
 import * as semver from 'wool/semver';

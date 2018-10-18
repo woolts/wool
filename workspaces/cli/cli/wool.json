@@ -9,7 +9,7 @@
       "wool/cli-args": "0.0.0 <= v < 1.0.0",
       "wool/cli-questions": "0.0.0 <= v < 1.0.0",
       "wool/colors": "0.0.0 <= v < 1.0.0",
-      "wool/errors": "0.0.0 <= v < 1.0.0",
+      "wool/messages": "0.0.0 <= v < 1.0.0",
       "wool/process": "0.0.0 <= v < 1.0.0",
       "wool/request": "0.0.0 <= v < 1.0.0",
       "wool/semver": "0.0.0 <= v < 1.0.0",

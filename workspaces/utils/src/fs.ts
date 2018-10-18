@@ -14,6 +14,9 @@ export const readDir = promisify(fs.readdir);
 export const readJson = (url: URL | string): any =>
   readFile(normaliseUrl(url)).then(buffer => JSON.parse(buffer.toString()));
 
+export const readJsonSync = (url: URL | string): any =>
+  JSON.parse(fs.readFileSync(normaliseUrl(url)).toString());
+
 // export const writeJson = (url: URL | string, data): any =>
 //   writeFile(
 //     new URL('wool.lock', normaliseUrl(url)),
@@ -35,5 +38,27 @@ export const dirSize = (url: URL | string) =>
     }, Promise.resolve(0)),
   );
 
+export const dirSizeSync = (url: URL | string) => {
+  const files = fs
+    .readdirSync(normalisePath(url))
+    .filter(f => !IGNORE_FILES.includes(f));
+  let sum = 0;
+
+  files.forEach(fileName => {
+    const filePath = path.join(normalisePath(url), fileName);
+    const stats = fs.statSync(filePath);
+    if (stats.isDirectory()) {
+      sum += dirSizeSync(filePath);
+    } else {
+      sum += fileSizeSync(filePath);
+    }
+  });
+
+  return sum;
+};
+
 export const fileSize = (url: URL | string) =>
   stat(normalisePath(url)).then(stats => stats.size);
+
+export const fileSizeSync = (url: URL | string) =>
+  fs.statSync(normalisePath(url)).size;

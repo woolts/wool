@@ -1,8 +1,8 @@
 import * as path from 'path';
-import { catalogue as errors } from 'wool/errors';
+import { errors } from 'wool/messages';
 
 import { all, bisect, get, has, map, size, unique, within } from './fp';
-import { readJson, writeFile } from './fs';
+import { readJson, readJsonSync, writeFile } from './fs';
 import { normaliseUrl, pathToUrl } from './path';
 
 // --- Paths ---
@@ -68,6 +68,9 @@ export const readPackageConfig = (url: URL | string): Promise<WoolConfig> =>
     // console.error(errors.readPackageConfig(err));
     throw err;
   });
+
+export const readPackageConfigSync = (url: URL | string): Promise<WoolConfig> =>
+  readJsonSync(new URL('wool.json', normaliseUrl(url)));
 
 export const writePackageConfig = (
   url: URL | string,

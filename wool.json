@@ -7,8 +7,8 @@
   "workspaces": [
     "workspaces/cli",
     "workspaces/colors",
-    "workspaces/errors",
     "workspaces/loader",
+    "workspaces/messages",
     "workspaces/process",
     "workspaces/request",
     "workspaces/semver",

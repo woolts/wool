@@ -7,24 +7,43 @@ import { padRight } from 'wool/utils';
 const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
 
 let singletonInterval;
+let singletonTimeout;
 
-export function startSpinner(message: () => string) {
+export function startSpinner(
+  message: () => string,
+  options: { silentUntil?: number } = {},
+) {
   let frame = 0;
   let first = false;
 
-  singletonInterval = setInterval(() => {
-    if (!first) {
-      clearLines(1);
-    }
-    first = false;
-    writeLine(`${colors.magenta(frames[frame])} ${message()}`);
+  let timeoutWrapper = next => next();
 
-    frame++;
-    frame = frame % frames.length;
-  }, 80);
+  if (options.silentUntil) {
+    timeoutWrapper = next => {
+      singletonTimeout = setTimeout(next, options.silentUntil);
+    };
+  }
+
+  timeoutWrapper(() => {
+    singletonInterval = setInterval(() => {
+      if (!first) {
+        clearLines(1);
+      }
+      first = false;
+      writeLine(`${colors.magenta(frames[frame])} ${message()}`);
+
+      frame++;
+      frame = frame % frames.length;
+    }, 80);
+  });
 }
 
 export function stopSpinner(message: () => string) {
+  if (singletonTimeout !== undefined) {
+    clearTimeout(singletonTimeout);
+    return;
+  }
+
   clearLines(1);
   writeLine(message());
   console.log('');
