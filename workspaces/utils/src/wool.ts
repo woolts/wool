@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { catalogue as errors } from 'wool/errors';
 
+import { all, bisect, get, has, map, size, unique, within } from './fp';
 import { readJson, writeFile } from './fs';
 import { normaliseUrl, pathToUrl } from './path';
 
@@ -175,4 +176,76 @@ export async function resolveWorkspaces(
   }
 
   return resolvedWorkspaces;
+}
+
+export async function getWorkspaceDependencyTree(workspaces: {
+  [name: string]: ResolvedWorkspace;
+}): Promise<{
+  tree: Array<ResolvedWorkspace>;
+  looped: Array<ResolvedWorkspace>;
+}> {
+  const withinWorkspaces = xs => {
+    // TODO: this doesn't account for external deps, fix
+    const xNames = map(get('config.name'), xs);
+    return y =>
+      within(
+        xNames,
+        has('config.dependencies.direct', y)
+          ? unique(
+              Object.keys(y.config.dependencies.direct || {}).concat(
+                Object.keys(y.config.dependencies.indirect || {}),
+              ),
+            )
+          : [],
+      );
+  };
+
+  // TODO: this would say that external deps are invalid, which is wrong
+  // const [valid, invalid] = bisect(withinWorkspaces(workspaces), workspaces);
+
+  // if (invalid.length > 0) {
+  //   console.log({ workspaces, valid, invalid });
+  //   // throw new Error('Invalid workspace dependency');
+  //   return { tree: [], looped: [] };
+  // }
+
+  const [withoutDeps, withDeps] = bisect(
+    w => size(w.config.dependencies.direct) === 0,
+    Object.values(workspaces),
+  );
+
+  let resolved = [].concat(withoutDeps);
+  let next = [].concat(withDeps);
+  let looped = [];
+
+  const MAX_LOOPS = 6;
+  let i = 0;
+
+  while (next.length > 0) {
+    if (i++ >= MAX_LOOPS) break;
+
+    const [newlyResolved, nextAttempt] = bisect(
+      withinWorkspaces(resolved),
+      next,
+    );
+
+    // console.log('newlyResolved', map(get('config.name'), newlyResolved));
+
+    resolved = resolved.concat(newlyResolved);
+
+    // If all of the next workspaces *only* have dependencies within next then
+    // these are looped and impossible to resolve.
+    const impossible =
+      nextAttempt.length > 0 &&
+      all(Boolean, map(withinWorkspaces(nextAttempt), nextAttempt));
+
+    if (impossible) {
+      next = [];
+      looped = nextAttempt;
+    } else {
+      next = nextAttempt;
+    }
+  }
+
+  return { tree: resolved, looped };
 }

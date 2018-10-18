@@ -5,13 +5,13 @@
     "http://localhost:7777"
   ],
   "workspaces": [
-    "workspaces/loader",
+    "workspaces/cli",
     "workspaces/colors",
-    "workspaces/process",
-    "workspaces/semver",
     "workspaces/errors",
-    "workspaces/utils",
+    "workspaces/loader",
+    "workspaces/process",
     "workspaces/request",
-    "workspaces/cli"
+    "workspaces/semver",
+    "workspaces/utils"
   ]
 }

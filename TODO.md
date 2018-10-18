@@ -5,7 +5,7 @@
   - `pkg` is the best option
   - However it critically does not support esm loaders
 - [x] Add `direct` and `indirect` groupings to dependencies
-- [ ] Automatically fix order of workspaces so they build in the correct order, based on the dependency graph
+- [x] Automatically fix order of workspaces so they build in the correct order, based on the dependency graph
 - [ ] Embed a specific node version into `wool`
   - This will prevent issues around incompatible node versions
   - It will make community upgrades easier as it will only be tied to the wool version, not the node version outside of our control
@@ -34,3 +34,5 @@
 - [x] Add `tasks` for `wool task . build` from `{ "tasks": { "build": "do thing" } }`
   - [x] With built-in nesting, `wool task . build.web` from `{ "tasks": { "build": { "web": "do web" } } }`, and `wool task . build` would run all nested tasks.
   - [ ] Shortcut cwd with `wool task build`
+- [ ] Add generic run watch, `wool run -w lsjroberts/example`, it watches files in local workspace
+- [ ] Add make watch `wool make . -w`

@@ -7,12 +7,16 @@ import { exec } from 'wool/process';
 import {
   dirSize,
   localPackagesPath,
+  get,
+  getWorkspaceDependencyTree,
+  map,
   pathToUrl,
   readInstalledPackageConfig,
   readPackageConfig,
   readPackageLock,
   resolveWorkspaces,
   writePackageConfig,
+  zipObject,
 } from 'wool/utils';
 
 import { startSpinner, stopSpinner } from '../spinners';
@@ -40,48 +44,64 @@ export default async function make({ args, options }) {
   const artifactsDir = path.join(resolvedDir, 'wool-stuff', 'build-artifacts');
 
   let continueMake = true;
-  const workspaces = await (options.force
-    ? resolveWorkspaces(resolvedDir)
-    : prepare(resolvedDir, artifactsDir)
-  ).catch(err => {
-    console.log('');
-    console.log(err.message);
-    continueMake = false;
-    return [];
-  });
+
+  const workspaces =
+    (await resolveWorkspaces(resolvedDir).catch(
+      handleWorkspaceError(resolvedDir),
+    )) || {};
+
+  const dependencyTree = await getWorkspaceDependencyTree(workspaces);
+
+  if (dependencyTree.looped.length > 0) {
+    console.log(
+      'There is an unresolvable loop in your dependency tree, I am unable to proceed.',
+    );
+    dependencyTree.looped.forEach(loop => {
+      console.log(`    ${loop.config.name}`);
+    });
+    return;
+  }
 
   if (!continueMake) return;
 
-  await compile(workspaces, artifactsDir, args);
+  const dirtyWorkspaces = await (options.force
+    ? zipObject(
+        map(get('config.name'), dependencyTree.tree),
+        dependencyTree.tree,
+      )
+    : prepare(dependencyTree.tree, artifactsDir));
 
-  if (Object.keys(workspaces).length === 0) {
+  if (Object.keys(dirtyWorkspaces).length === 0) {
     console.log(`No changes made since last compilation 👍`);
+    return;
   }
+
+  await compile(dirtyWorkspaces, artifactsDir, args);
 }
 
-async function prepare(resolvedDir, artifactsDir) {
-  const workspaces = await resolveWorkspaces(resolvedDir).catch(
-    handleWorkspaceError(resolvedDir),
-  );
+async function prepare(workspaces, artifactsDir) {
   const dirtyWorkspaces = {};
 
-  for (let name in workspaces) {
-    const pkg = workspaces[name];
+  for (let workspace of workspaces) {
     const [lastModifiedTime, lastModifiedFile] = (await exec(
       `find ${
-        pkg.dir
+        workspace.dir
       } -type f -print0 | xargs -0 stat -f "%m %N" | sort -rn | head -1`,
-    )).split(' ');
+    ))
+      .toString()
+      .split(' ');
 
     const { compiledAt } = await readPackageConfig(
-      pathToUrl(path.join(artifactsDir, name, pkg.version)),
+      pathToUrl(
+        path.join(artifactsDir, workspace.config.name, workspace.version),
+      ),
     ).catch(() => ({ compiledAt: 9999999999 }));
 
     if (
       compiledAt === undefined ||
       Number(lastModifiedTime) >= Math.floor(Number(compiledAt) / 1000)
     ) {
-      dirtyWorkspaces[name] = pkg;
+      dirtyWorkspaces[workspace.config.name] = workspace;
     }
   }
 
@@ -93,14 +113,8 @@ async function validate(pkg) {
 }
 
 async function compile(workspaces, artifactsDir, args) {
-  for (let workspace in workspaces) {
-    await makePackage(
-      artifactsDir,
-      workspaces,
-      workspace,
-      workspaces[workspace],
-      args,
-    );
+  for (let name in workspaces) {
+    await makePackage(artifactsDir, workspaces, name, workspaces[name], args);
   }
 }
 
@@ -141,10 +155,8 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
     tsconfigPath,
     JSON.stringify(
       await tsconfigTemplate(
-        artifactsDir,
         packageArtifactDir,
         workspaces,
-        name,
         pkg,
         args,
         await readPackageLock(pathToUrl(dir)).catch(() => ({})),
@@ -224,10 +236,8 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
 }
 
 async function tsconfigTemplate(
-  artifactsDir,
   packageArtifactDir,
   workspaces,
-  name,
   pkg,
   args,
   lock,
@@ -287,7 +297,7 @@ async function tsconfigTemplate(
       target: 'esnext',
       baseUrl: path.relative(dir, rootDir),
       paths,
-      typeRoots: ['/Users/laurenceroberts/.wool/types'], // TODO: localTypesPath
+      typeRoots: [localPackagesPath.replace('packages', 'types')], // TODO: localTypesPath
       outDir,
     },
     references,

@@ -56,6 +56,19 @@ export function curry(fn: Function): Function {
   return fn.apply(null, Array.prototype.slice.call(arguments, 1));
 }
 
+export const all = curry(function all<X>(
+  predicate: Function,
+  xs: Array<X> | undefined,
+): boolean {
+  if (xs === undefined) return true;
+  const predicateFn = createPredicate(predicate);
+  let all = true;
+  for (let x of xs) {
+    all = all && predicateFn(x);
+  }
+  return all;
+});
+
 export const bisect = curry(function bisect<X>(
   predicate: Predicate<X>,
   xs: Array<X> | undefined,
@@ -99,30 +112,36 @@ export const findOr = curry(function findOr<X, Y>(
   return or;
 });
 
-export const get = curry((path: string | Array<string>, x: object) => {
-  const paths = Array.isArray(path) ? path : path.split('.');
-  if (paths.length === 0) {
-    throw new Error('How the heck did you get here?');
-  }
-  if (paths.length === 1) {
-    return x[paths[0]];
-  }
-  return get(paths.slice(1), x[paths[0]]);
-});
+export const get = curry(
+  (path: string | Array<string>, x: object | undefined) => {
+    if (x === undefined) return undefined;
+    const paths = Array.isArray(path) ? path : path.split('.');
+    if (paths.length === 0) {
+      throw new Error('How the heck did you get here?');
+    }
+    if (paths.length === 1) {
+      return x[paths[0]];
+    }
+    return get(paths.slice(1), x[paths[0]]);
+  },
+);
 
-export const has = curry((path: string | Array<string>, x: object) => {
-  const paths = Array.isArray(path) ? path : path.split('.');
-  if (paths.length === 0) {
-    throw new Error('How the heck did you get here?');
-  }
-  if (paths.length === 1) {
-    return x[paths[0]] !== undefined;
-  }
-  if (x[paths[0]] === undefined) {
-    return false;
-  }
-  return has(paths.slice(1), x[paths[0]]);
-});
+export const has = curry(
+  (path: string | Array<string>, x: object | undefined) => {
+    if (x === undefined) return false;
+    const paths = Array.isArray(path) ? path : path.split('.');
+    if (paths.length === 0) {
+      throw new Error('How the heck did you get here?');
+    }
+    if (paths.length === 1) {
+      return x[paths[0]] !== undefined;
+    }
+    if (x[paths[0]] === undefined) {
+      return false;
+    }
+    return has(paths.slice(1), x[paths[0]]);
+  },
+);
 
 export const map = curry(function map<X, Y>(
   iteratee: Iteratee<X, Y>,
@@ -165,6 +184,13 @@ export const range = (from: number, to?: number) => {
   return new Array(to_ - from_).fill(0).map((_, i) => i + from);
 };
 
+export function size<X>(xs: Array<any> | object | undefined) {
+  if (xs === undefined) return 0;
+  if (Array.isArray(xs)) return xs.length;
+  if (typeof xs === 'object') return Object.keys(xs).length;
+  return 0;
+}
+
 export const some = curry(function some<X>(
   predicate: Function,
   xs: Array<X> | undefined,
@@ -196,6 +222,25 @@ export const uniqueBy = curry(function uniqueBy<X, Y>(
     return isDuplicate ? acc.concat(i) : acc;
   }, []);
   return xs.filter((_, i) => !duplicateIndices.includes(i));
+});
+
+export const within = curry(function within<T>(xs: Array<T>, ys: Array<T>) {
+  if (xs.length < ys.length) return false;
+  for (let i = 0; i < ys.length; i++) {
+    if (!xs.includes(ys[i])) return false;
+  }
+  return true;
+});
+
+export const zipObject = curry(function zipObject<X>(
+  keys: Array<string>,
+  values: Array<X>,
+): { [key: string]: X } {
+  const zipped = {};
+  keys.forEach((key, index) => {
+    zipped[key] = values[index];
+  });
+  return zipped;
 });
 
 // --- Predicate ---

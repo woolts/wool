@@ -218,10 +218,44 @@ Use `--workspace` / `-w` to add the package into a specific workspace other than
 wool add lsjroberts/package -w workspaces/example
 ```
 
-**Add a global dependency** (todo)
+**Run a local task** (wip)
+
+```json
+{
+  "tasks": {
+    "test": "wool run example/test ."
+  }
+}
+```
 
 ```
-wool add --global lsjroberts/package
+wool task test
+```
+
+```json
+{
+  "tasks": {
+    "test": "wool run example/test .",
+    "build": {
+      "test": "wool task test",
+      "make": "wool make ."
+    }
+  }
+}
+```
+
+```
+wool task build
+```
+
+```
+wool task build.make
+```
+
+**Install a global dependency** (todo)
+
+```
+wool install lsjroberts/package
 ```
 
 Installs a package but does not add it to the local project. Its binaries are symlinked from the `~/.wool/.bin` directory.
@@ -239,7 +273,7 @@ e.g.
 ```
 
 ```
-wool add lsjroberts/package --global
+wool install lsjroberts/package
 ```
 
 ```

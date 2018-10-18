@@ -16,7 +16,6 @@
       "wool/utils": "0.0.0 <= v < 1.0.0"
     },
     "indirect": {
-      "wool/colors": "0.0.0 <= v < 1.0.0",
       "wool/process": "0.0.0 <= v < 1.0.0"
     }
   }
