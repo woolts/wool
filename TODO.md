@@ -18,7 +18,7 @@
   - or `import { path } from 'wool';`
   - or `import { path } from 'node/path';`
 - [ ] Catch all errors and map through sourcemaps to ts code
-- [ ] Add `wool stats` (tbd) for stats on installed packages
+- [x] Add `wool summary` for info on installed packages
 - [ ] Suppress esm experimental warning (not any others)
 - [ ] Fix `wool.lock` to include direct and indirect deps from parent workspace
 - [ ] Rename `wool.lock` to `wool-lock.json` since it is a json file
@@ -27,6 +27,7 @@
   - Only in private packages
 - [ ] Add a `wool-stats.json` to store compilation info
 - [ ] When running `wool run` check for missing dependencies, run a `wool make .` if required and a `wool add ...` for the remaining non-local deps
+- [ ] When running `wool make .` check for missing dependencies and if required run a `wool add ...`
 - [ ] Change global add to `wool install wool/cli`
   - [ ] And `wool install wool/cli -v 0.2.0`
 - [ ] Add generic run configs, `wool run -c example.json lsjroberts/example`
@@ -36,3 +37,12 @@
   - [ ] Shortcut cwd with `wool task build`
 - [ ] Add generic run watch, `wool run -w lsjroberts/example`, it watches files in local workspace
 - [ ] Add make watch `wool make . -w`
+- [ ] Change `wool run lsjroberts/example/1.0.0` to `wool run lsjroberts/example -v 1.0.0`
+- [ ] Add `wool run lsjroberts/example -v 1.0` and `wool run lsjroberts/example -v 1`
+- [ ] Always run the latest version of a package acceptable to the given constraint
+  - [ ] If none specified, run the version that matches the local dep if there is one
+  - [ ] If the user attempts to run a version that would not be picked by the local dep, warn and await confirmation, unless `--force` is given
+- [ ] Fail fast on make, stop compilation after the first error
+  - e.g. "make failed on wool/cli with 12 errors, the first was: ... to see all run again with `--verbose`"
+- [ ] Fix dependency tree order
+  - It errored on a weird situation when utils failed after cli, but may have caused cli to not see utils anymore

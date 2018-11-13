@@ -135,12 +135,6 @@ If you wanted, you can have a root version, then another set of packages with th
 }
 ```
 
-> **Important note:** The order of the list of workspaces is important. You currently must manually ensure a package that depends on a package within the same repo is listed _after_ its dependency.
->
-> If you see typescript compilation errors about packages not being found when running `wool make .`, this is likely the cause.
->
-> However, typescript lint errors in your IDE about missing packages are just your IDE not understanding wool. IDE support will come in the future.
-
 ## CLI
 
 Every command has the following options:
@@ -155,6 +149,8 @@ Compiles modified workspaces in the given directory into `./wool-stuff/build-art
 ```
 wool make .
 ```
+
+Wool will detect the compilation order for your packages based on their dependency tree.
 
 **Run a package** (wip)
 

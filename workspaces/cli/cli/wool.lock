@@ -1,33 +1,50 @@
 {
   "wool/cli-args": {
-    "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/cli-questions": {
-    "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/colors": {
-    "version": "0.0.0",
-    "constraint": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/messages": {
-    "version": "0.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/process": {
-    "version": "0.0.0",
-    "constraint": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/request": {
-    "version": "0.0.0",
-    "constraint": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/semver": {
-    "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   },
   "wool/utils": {
-    "version": "0.0.0",
-    "range": "0.0.0 <= v < 1.0.0"
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
   }
 }
