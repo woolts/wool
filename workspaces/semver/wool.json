@@ -1,5 +1,5 @@
 {
   "name": "wool/semver",
-  "entry": "src/index.ts",
+  "entry": "semver.ts",
   "dependencies": {}
 }

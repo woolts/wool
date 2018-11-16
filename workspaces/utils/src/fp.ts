@@ -87,6 +87,20 @@ export const bisect = curry(function bisect<X>(
   return [left, right];
 });
 
+export const each = curry(function each<X>(
+  iteratee: (x: X, i: number | string) => void,
+  xs: Array<X> | { [key: string]: X } | undefined,
+): void {
+  if (Array.isArray(xs)) return xs.forEach(iteratee);
+  if (typeof xs === 'object') {
+    return Object.keys(xs).forEach(k => {
+      if (xs.hasOwnProperty(k)) {
+        iteratee(xs[k], k);
+      }
+    });
+  }
+});
+
 export const find = curry(function find<X>(
   predicate: Predicate<X>,
   xs: Array<X> | undefined,
@@ -110,6 +124,22 @@ export const findOr = curry(function findOr<X, Y>(
     if (predicateFn(x)) return x;
   }
   return or;
+});
+
+export const filter = curry(function filter<X>(
+  predicate: Predicate<X>,
+  xs: Array<X> | undefined,
+): Array<X> {
+  if (xs === undefined) return [];
+  console.log('filter', { xs });
+  const predicateFn = createPredicate(predicate);
+  return xs.filter(predicateFn);
+});
+
+export const flatten = curry(function flatten<X>(
+  xss: Array<Array<X>>,
+): Array<X> {
+  return xss.reduce((sum, xs) => sum.concat(...xs), []);
 });
 
 export const get = curry(
@@ -143,6 +173,11 @@ export const has = curry(
   },
 );
 
+export const keys = (x: object | undefined): Array<string> => {
+  if (x === undefined) return [];
+  return Object.keys(x);
+};
+
 export const map = curry(function map<X, Y>(
   iteratee: Iteratee<X, Y>,
   xs: Array<X> | object,
@@ -151,6 +186,27 @@ export const map = curry(function map<X, Y>(
   if (Array.isArray(xs)) return xs.map(iterateeFn);
   if (typeof xs === 'object') return map(iterateeFn, Object.values(xs));
 });
+
+export const mapValues = curry(function mapValues<X, Y>(
+  // iteratee: Iteratee<X, Y>,
+  iteratee: any,
+  obj: object,
+): object {
+  const iterateeFn = createIteratee(iteratee);
+  const out = {};
+  Object.keys(obj).forEach((key, index) => {
+    out[key] = iterateeFn(obj[key], index);
+  });
+  return out;
+});
+
+export const max = (numbers: Array<number>) => {
+  let m = -Infinity;
+  numbers.forEach(n => {
+    if (n > m) m = n;
+  });
+  return m;
+};
 
 export const padLeft = curry((char: string, len: number, str: string) => {
   if (str.length >= len) return str;
@@ -178,6 +234,23 @@ export const pick = curry((ks: string | Array<string>, x: object) => {
   return out;
 });
 
+export const pickBy = curry(function pickBy<X, Y>(
+  iteratee: Iteratee<X, Y>,
+  x: object,
+) {
+  const out = {};
+  const iterateeFn = createIteratee(iteratee);
+  Object.keys(x).forEach((k, i) => {
+    if (iterateeFn(x[k], i)) {
+      out[k] = x[k];
+    }
+  });
+  return out;
+});
+
+export const pipe = (...fns: Array<(value: any) => any>) => value =>
+  fns.reduce((result, fn) => fn(result), value);
+
 export const range = (from: number, to?: number) => {
   const from_ = to ? from : 0;
   const to_ = to || from;
@@ -204,9 +277,14 @@ export const some = curry(function some<X>(
 });
 
 export function unique<X>(xs: Array<X>): Array<X> {
-  return xs.filter((x, i) =>
-    [...xs.slice(0, i), ...xs.slice(i + 1)].includes(x),
-  );
+  const out = [];
+  xs.forEach(x => {
+    // TODO: make O(1)
+    if (!out.includes(x)) {
+      out.push(x);
+    }
+  });
+  return out;
 }
 
 export const uniqueBy = curry(function uniqueBy<X, Y>(

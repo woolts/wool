@@ -1,6 +1,5 @@
 import * as http from 'http';
 import * as fs from 'fs';
-import { curry } from 'wool/utils';
 
 interface RequestOptions {
   json?: boolean;
@@ -30,7 +29,7 @@ export function request(
   const requestPromise: Promise<Response> = new Promise((resolve, reject) => {
     try {
       http
-        .get(url, httpOptions, curry(requestGet)(options)(resolve)) // TODO: add partial() util
+        .get(url, httpOptions, res => requestGet(options, resolve, res)) // TODO: add partial() util
         .on('error', err => {
           reject(err);
         });

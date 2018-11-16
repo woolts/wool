@@ -250,6 +250,8 @@ async function tsconfigTemplate(
 
   await Promise.all(
     Object.keys(lock).map(async dep => {
+      // TODO: it should only shortcut to local workspace if the constraint
+      // matches the local version
       if (workspaces && workspaces[dep]) {
         paths[dep] = [
           // ./lsjroberts/example
@@ -330,7 +332,7 @@ async function handleTypescriptCompileError(err) {
         /([^(]+)\(([0-9]+),([0-9]+)\): error TS2307: Cannot find module '(.+)'\./,
       );
       const genericMatch = compileError.match(
-        /([^(]+)\(([0-9]+),([0-9]+)\): error (.+): (.+)/,
+        /([^(]+)\(([0-9]+),([0-9]+)\): error ([^:]+): ((.|\n)+)/,
       );
 
       if (cannotFindModuleMatch) {
@@ -353,7 +355,7 @@ async function handleTypescriptCompileError(err) {
         });
       }
 
-      return err.message;
+      return err.stdout;
     }),
   );
 

@@ -1,4 +1,5 @@
 import * as colors from 'wool/colors';
+import { map, max, padRight } from 'wool/utils';
 
 const WIDTH = 80;
 
@@ -6,9 +7,10 @@ export default {
   repeat,
   title,
   message,
+  table,
 };
 
-function repeat(char, times) {
+function repeat(char: string, times: number) {
   const result = [];
   for (let i = 0; i < times; i++) {
     result.push(char);
@@ -16,7 +18,7 @@ function repeat(char, times) {
   return result.join('');
 }
 
-function title(label, location, color = colors.red) {
+function title(label: string, location: string, color = colors.red) {
   let spacerCount = WIDTH - label.length - location.length - 4;
   if (spacerCount < 2) spacerCount = 2;
 
@@ -33,7 +35,7 @@ function title(label, location, color = colors.red) {
   );
 }
 
-function message(string) {
+function message(string: string) {
   const wrapped = [];
   const words = string.split(' ');
   let chars = 0;
@@ -49,4 +51,29 @@ function message(string) {
     }
   });
   return wrapped.join(' ');
+}
+
+/**
+ * ```ts
+ * table([
+ *   ['Hello', 'World'],
+ *   ['Bonjour', 'Monde'],
+ * ]);
+ * ```
+ */
+function table(rows: Array<Array<string>>) {
+  const pad = padRight(' ');
+
+  const out = map(() => [], rows);
+
+  rows.forEach((columns, row) => {
+    columns.forEach((value, column) => {
+      // TODO: fix map types
+      // const columnSize = max(map(r => r[column].length, rows));
+      const columnSize = max(rows.map(r => r[column].length));
+      out[row].push(pad(columnSize, value));
+    });
+  });
+
+  return map(c => c.join('  '), out).join('\n');
 }

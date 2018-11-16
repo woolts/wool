@@ -1,9 +1,5 @@
 {
   "name": "wool/utils",
   "entry": "src/index.ts",
-  "dependencies": {
-    "direct": {
-      "wool/messages": "0.0.0 <= v < 1.0.0"
-    }
-  }
+  "dependencies": {}
 }

@@ -1,11 +1,13 @@
 import runCli from 'wool/cli-args';
 
 import add from './commands/add';
+import dependencies from './commands/dependencies';
 import init from './commands/init';
 import list from './commands/list';
 // import local from './commands/local';
 import make from './commands/make';
 import pack from './commands/pack';
+import preflight from './commands/preflight';
 import runPrivate from './commands/run-private';
 import publish from './commands/publish';
 import run from './commands/run';
@@ -18,11 +20,13 @@ const app = {
   version: '0.0.0',
   commands: [
     add,
+    dependencies,
     init,
     list,
     // local,
     make,
     pack,
+    preflight,
     publish,
     run,
     runPrivate,

@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { errors } from 'wool/messages';
 
 import { all, bisect, get, has, map, size, unique, within } from './fp';
 import { readJson, readJsonSync, writeFile } from './fs';
@@ -56,18 +55,14 @@ export interface WoolLock {
 }
 
 export interface ResolvedSpecifier {
-  name: string;
   version: string;
   constraint: string;
-  registry: string;
+  registry: string | false;
   size: number;
 }
 
 export const readPackageConfig = (url: URL | string): Promise<WoolConfig> =>
-  readJson(new URL('wool.json', normaliseUrl(url))).catch(err => {
-    // console.error(errors.readPackageConfig(err));
-    throw err;
-  });
+  readJson(new URL('wool.json', normaliseUrl(url)));
 
 export const readPackageConfigSync = (url: URL | string): Promise<WoolConfig> =>
   readJsonSync(new URL('wool.json', normaliseUrl(url)));
@@ -82,11 +77,7 @@ export const writePackageConfig = (
   );
 
 export const readPackageLock = (url: URL | string): Promise<WoolLock> =>
-  readJson(new URL('wool.lock', normaliseUrl(url))).catch(err => {
-    // TODO: get stack
-    console.error(errors.readPackageLock(err));
-    throw err;
-  });
+  readJson(new URL('wool.lock', normaliseUrl(url)));
 
 export const writePackageLock = (
   url: URL | string,
@@ -134,6 +125,7 @@ interface ResolvedWorkspace {
   private: boolean;
   parentDir: string;
   config: WoolConfig;
+  lock: WoolLock;
 }
 
 export async function resolveWorkspaces(
@@ -162,6 +154,7 @@ export async function resolveWorkspaces(
         private: config.private || false,
         parentDir,
         config,
+        lock: await readPackageLock(pathToUrl(dir)),
       },
     };
   }
@@ -193,13 +186,11 @@ export async function getWorkspaceDependencyTree(workspaces: {
     return y =>
       within(
         xNames,
-        has('config.dependencies.direct', y)
-          ? unique(
-              Object.keys(y.config.dependencies.direct || {}).concat(
-                Object.keys(y.config.dependencies.indirect || {}),
-              ),
-            )
-          : [],
+        unique(
+          Object.keys(get('config.dependencies.direct', y) || {}).concat(
+            Object.keys(get('config.dependencies.indirect', y) || {}),
+          ),
+        ),
       );
   };
 
@@ -225,7 +216,10 @@ export async function getWorkspaceDependencyTree(workspaces: {
   let i = 0;
 
   while (next.length > 0) {
-    if (i++ >= MAX_LOOPS) break;
+    if (i++ >= MAX_LOOPS) {
+      // TODO: warning
+      break;
+    }
 
     const [newlyResolved, nextAttempt] = bisect(
       withinWorkspaces(resolved),
@@ -238,11 +232,12 @@ export async function getWorkspaceDependencyTree(workspaces: {
 
     // If all of the next workspaces *only* have dependencies within next then
     // these are looped and impossible to resolve.
-    const impossible =
-      nextAttempt.length > 0 &&
-      all(Boolean, map(withinWorkspaces(nextAttempt), nextAttempt));
+    // const impossible =
+    //   nextAttempt.length > 0 &&
+    //   all(Boolean, map(withinWorkspaces(nextAttempt), nextAttempt));
 
-    if (impossible) {
+    // if (impossible) {
+    if (newlyResolved.length === 0 && nextAttempt.length > 0) {
       next = [];
       looped = nextAttempt;
     } else {

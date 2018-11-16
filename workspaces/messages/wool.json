@@ -3,7 +3,8 @@
   "entry": "index.ts",
   "dependencies": {
     "direct": {
-      "wool/colors": "0.0.0 <= v < 0.0.0"
+      "wool/colors": "0.0.0 <= v < 1.0.0",
+      "wool/utils": "0.0.0 <= v < 1.0.0"
     }
   }
 }

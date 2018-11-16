@@ -7,7 +7,6 @@ import { spawn } from 'wool/process';
 import { download, request } from 'wool/request';
 import * as semver from 'wool/semver';
 import {
-  ResolvedSpecifier,
   WoolCommonConfig,
   bisect,
   findOr,
@@ -16,6 +15,7 @@ import {
   localPackagesPath,
   localPackagesUrl,
   map,
+  mapValues,
   readActivePackageConfig,
   readActivePackageLock,
   readPackageConfig,
@@ -40,6 +40,15 @@ interface Plan {
   move: Array<string>;
   invalid: Array<string>;
   unresolved: Array<UnresolvedSpecifier>;
+}
+
+// TODO: extend from utils (throws a ts error on props not existing)
+interface ResolvedSpecifier {
+  name: string;
+  version: string;
+  constraint: string;
+  registry: string | false;
+  size: number;
 }
 
 interface UnresolvedSpecifier {
@@ -110,9 +119,15 @@ async function createPlan(
     Array<string>
   ];
 
+  const resolvedSpecifiers = await resolveSpecifiers(woolConfig, valid);
+  const resolvedSpecifiersWithNames = mapValues(
+    (resolvedSpecifier, name) => ({ ...resolvedSpecifier, name }),
+    resolvedSpecifiers,
+  );
+
   const [all, unresolved] = bisect(
     s => !s.unresolved,
-    await resolveSpecifiers(woolConfig, valid),
+    resolvedSpecifiersWithNames,
   ) as [Array<ResolvedSpecifier>, Array<UnresolvedSpecifier>];
   // TODO: technically this is invalid as they have to be of the same type
 
@@ -179,7 +194,7 @@ async function confirmWithUser(plan: Plan) {
         `    ${colors.cyan(s.name)}  ${colors.blue(s.version)}  ${
           s.constraint
         }  ${
-          s.registry === 'local'
+          s.registry === false
             ? '(already downloaded)'
             : colors.white(s.registry)
         }`,
@@ -189,9 +204,9 @@ async function confirmWithUser(plan: Plan) {
   }
 
   const totalSize = plan.install.all.reduce((sum, s) => sum + (s.size || 0), 0);
-  const hasNonLocal = some(s => s.registry !== 'local', plan.install.all);
+  const hasNonLocal = some(s => s.registry !== false, plan.install.all);
   const hasUnknown = some(
-    s => s.registry !== 'local' && s.size === null,
+    s => s.registry !== false && s.size === null,
     plan.install.all,
   );
 
@@ -251,7 +266,7 @@ async function confirmWithUser(plan: Plan) {
 
 function downloadPackages(plan: Plan) {
   const downloads = plan.install.all
-    .filter(s => s.registry !== 'local')
+    .filter(s => s.registry !== false)
     .map(async s => {
       const dest = new URL(
         `../bundles/${s.name.replace('/', '_')}_${s.version}.tar.gz`,
@@ -461,7 +476,7 @@ async function resolveSpecifier(
 
   const locationMaxVersions = [
     {
-      location: 'local',
+      location: false,
       version:
         Object.keys(localVersions).length > 0
           ? semver.findMaxVersion(Object.keys(localVersions))
@@ -482,7 +497,7 @@ async function resolveSpecifier(
 
   const maxVersionFrom = (findOr(
     ({ version }) => version === maxVersion,
-    { location: 'local' } as any,
+    { location: false } as any,
     locationMaxVersions,
   ) as any).location;
   const maxVersionSize = (findOr(
@@ -547,6 +562,11 @@ function toSentence(xs: Array<string>) {
 }
 
 function isValidName(specifier) {
+  if (specifier.startsWith('npm/')) {
+    console.log(colors.red('Adding npm dependencies is not yet supported.'));
+    return false;
+  }
+
   // https://regex101.com/r/s7UWNw/1
   return /^[a-z0-1_-]+\/[a-z0-1_-]+$/.test(specifier);
 }
