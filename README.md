@@ -309,9 +309,9 @@ const suite = describe('example', [
 run(suite);
 ```
 
-See [/woolts/wool/workspaces/tree/master/workspaces/test/README.md](workspaces/test/README.md) for further information.
+See [workspaces/test](workspaces/test) for further information.
 
-See [/woolts/wool/workspaces/tree/master/workspaces/core](workspaces/core) for a working example.
+See [workspaces/core](workspaces/core) for a working example.
 
 <!--
 
