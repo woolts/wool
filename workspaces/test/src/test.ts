@@ -56,6 +56,10 @@ function runAssertion(assertion: Assertion) {
         assertion.should
       }`,
     );
+    console.log('  ---');
+    console.log(`  expected: ${JSON.stringify(assertion.expect)}`);
+    console.log(`  received: ${JSON.stringify(assertion.actual)}`);
+    console.log('  ...');
   }
 }
 
