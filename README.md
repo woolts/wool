@@ -277,6 +277,42 @@ ls ~/.wool/.bin/example
 > ~/.wool/.bin/example -> ../packages/lsjroberts/package/1.0.0/bin/example.sh
 ```
 
+## Testing
+
+A test suite can be created as a workspace, for example the `workspaces/example/src` would have its tests in `workspaces/example/tests`, each with their own `wool.json` and dependencies.
+
+We can then add a test task to the parent workspace:
+
+```json
+// workspaces/example/wool.json
+{
+  // ...
+  "tasks": {
+    "test": ["wool", "run-private", "wool/example-tests"]
+  }
+}
+```
+
+```ts
+// workspaces/example/tests/index.ts
+import { assert, describe, run } from 'wool/test';
+
+const suite = describe('example', [
+  assert({
+    given: 'an example',
+    should: 'return true',
+    actual: true,
+    expect: true
+  }),
+]);
+
+run(suite);
+```
+
+See [/woolts/wool/workspaces/tree/master/workspaces/test/README.md](workspaces/test/README.md) for further information.
+
+See [/woolts/wool/workspaces/tree/master/workspaces/core](workspaces/core) for a working example.
+
 <!--
 
 **Execute a node ts file** (todo)
