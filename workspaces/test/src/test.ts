@@ -7,7 +7,7 @@ export interface Assertion {
   given: string;
   should: string;
   actual: Function;
-  expect: any;
+  expected: any;
 }
 
 export function describe(
@@ -50,7 +50,7 @@ function runSuite(suite: Suite, parents?: Array<string>) {
 function runAssertion(assertion: Assertion) {
   assertionCount += 1;
 
-  const result = isEqual(assertion.actual, assertion.expect);
+  const result = isEqual(assertion.actual, assertion.expected);
 
   if (result) {
     console.log(
@@ -65,7 +65,7 @@ function runAssertion(assertion: Assertion) {
       }`,
     );
     console.log('  ---');
-    console.log(`  expected: ${JSON.stringify(assertion.expect)}`);
+    console.log(`  expected: ${JSON.stringify(assertion.expected)}`);
     console.log(`  received: ${JSON.stringify(assertion.actual)}`);
     console.log('  ...');
   }

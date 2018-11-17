@@ -72,3 +72,4 @@
   wool/terminal
   wool/test
   ```
+- [ ] Extract cli commands into programattic actions which the cli calls and provides a terminal interface to

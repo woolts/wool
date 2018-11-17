@@ -7,7 +7,7 @@ export default describe('Maybe', [
       given: 'a value',
       should: 'return that value',
       actual: Maybe.just('value'),
-      expect: 'value',
+      expected: 'value',
     }),
   ]),
 
@@ -16,7 +16,7 @@ export default describe('Maybe', [
       given: 'called',
       should: 'return null',
       actual: Maybe.nothing(),
-      expect: null,
+      expected: null,
     }),
   ]),
 
@@ -25,13 +25,13 @@ export default describe('Maybe', [
       given: 'a default and nothing',
       should: 'return the default',
       actual: Maybe.withDefault('default', Maybe.nothing()),
-      expect: 'default',
+      expected: 'default',
     }),
     assert({
       given: 'a default and a value',
       should: 'return the value',
       actual: Maybe.withDefault('default', Maybe.just('value')),
-      expect: 'value',
+      expected: 'value',
     }),
   ]),
 
@@ -40,13 +40,13 @@ export default describe('Maybe', [
       given: 'nothing',
       should: 'return nothing',
       actual: Maybe.map(a => a, Maybe.nothing()),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
     assert({
       given: 'a value',
       should: 'return the mapped value',
       actual: Maybe.map(a => `mapped:${a}`, Maybe.just('value')),
-      expect: 'mapped:value',
+      expected: 'mapped:value',
     }),
     assert({
       given: 'nested maps',
@@ -55,13 +55,13 @@ export default describe('Maybe', [
         a => `1:${a}`,
         Maybe.map(a => `0:${a}`, Maybe.just('value')),
       ),
-      expect: '1:0:value',
+      expected: '1:0:value',
     }),
     assert({
       given: 'nested maps with nothing',
       should: 'return nothing',
       actual: Maybe.map(a => a, Maybe.map(a => a, Maybe.nothing())),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
   ]),
 
@@ -74,7 +74,7 @@ export default describe('Maybe', [
         Maybe.nothing(),
         Maybe.nothing(),
       ),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
     assert({
       given: 'a nothing and a value',
@@ -84,7 +84,7 @@ export default describe('Maybe', [
         Maybe.nothing(),
         Maybe.just('two'),
       ),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
     assert({
       given: 'two values',
@@ -94,7 +94,7 @@ export default describe('Maybe', [
         Maybe.just('one'),
         Maybe.just('two'),
       ),
-      expect: 'one:two',
+      expected: 'one:two',
     }),
   ]),
 
@@ -103,13 +103,13 @@ export default describe('Maybe', [
       given: 'nothing',
       should: 'return nothing',
       actual: Maybe.andThen(a => Maybe.just(a), Maybe.nothing()),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
     assert({
       given: 'a value',
       should: 'return just the value',
       actual: Maybe.andThen(a => Maybe.just(a), Maybe.just('value')),
-      expect: Maybe.just('value'),
+      expected: Maybe.just('value'),
     }),
     assert({
       given: 'a value and a mapping',
@@ -118,7 +118,7 @@ export default describe('Maybe', [
         a => Maybe.just(`mapped:${a}`),
         Maybe.just('value'),
       ),
-      expect: Maybe.just('mapped:value'),
+      expected: Maybe.just('mapped:value'),
     }),
     assert({
       given: 'a chain with a nothing',
@@ -127,7 +127,7 @@ export default describe('Maybe', [
         a => Maybe.andThen(b => Maybe.andThen(c => Maybe.nothing(), b), a),
         Maybe.just('value'),
       ),
-      expect: Maybe.nothing(),
+      expected: Maybe.nothing(),
     }),
     assert({
       given: 'a chain with a value',
@@ -140,7 +140,7 @@ export default describe('Maybe', [
           ),
         Maybe.just('value'),
       ),
-      expect: Maybe.just('mapped:value'),
+      expected: Maybe.just('mapped:value'),
     }),
   ]),
 
@@ -149,13 +149,13 @@ export default describe('Maybe', [
       given: 'a value',
       should: 'return true',
       actual: Maybe.isJust(Maybe.just('value')),
-      expect: true,
+      expected: true,
     }),
     assert({
       given: 'nothing',
       should: 'return false',
       actual: Maybe.isJust(Maybe.nothing()),
-      expect: false,
+      expected: false,
     }),
   ]),
 
@@ -164,13 +164,13 @@ export default describe('Maybe', [
       given: 'a value',
       should: 'return false',
       actual: Maybe.isNothing(Maybe.just('value')),
-      expect: false,
+      expected: false,
     }),
     assert({
       given: 'nothing',
       should: 'return true',
       actual: Maybe.isNothing(Maybe.nothing()),
-      expect: true,
+      expected: true,
     }),
   ]),
 ]);

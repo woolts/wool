@@ -112,13 +112,13 @@ describe('The String module', [
       given: 'a palindrome',
       should: 'have no effect',
       actual: String.reverse('hannah'),
-      expect: 'hannah'
+      expected: 'hannah'
     }),
     assert({
       given: 'a known string',
       should: 'reverse',
       actual: String.reverse('abcdefg'),
-      expect: 'gfedcba'
+      expected: 'gfedcba'
     }),
     fuzz({
       given: fuzz.string(),
@@ -127,7 +127,7 @@ describe('The String module', [
         String.reverse,
         String.reverse
       ),
-      expect: fuzz.given()
+      expected: fuzz.given()
     })
   ])
 ]);
