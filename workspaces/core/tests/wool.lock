@@ -1,0 +1,14 @@
+{
+  "wool/core": {
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
+  },
+  "wool/test": {
+    "version": "0.1.0",
+    "constraint": "0.0.0 <= v < 1.0.0",
+    "registry": false,
+    "size": 0
+  }
+}

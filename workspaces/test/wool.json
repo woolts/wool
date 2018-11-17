@@ -1,0 +1,5 @@
+{
+  "name": "wool/test",
+  "entry": "src/test.ts",
+  "dependencies": {}
+}

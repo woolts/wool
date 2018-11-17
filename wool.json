@@ -6,12 +6,14 @@
   ],
   "workspaces": [
     "workspaces/cli",
+    "workspaces/core",
     "workspaces/colors",
     "workspaces/loader",
     "workspaces/messages",
     "workspaces/process",
     "workspaces/request",
     "workspaces/semver",
+    "workspaces/test",
     "workspaces/utils"
   ]
 }

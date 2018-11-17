@@ -46,3 +46,29 @@
   - e.g. "make failed on wool/cli with 12 errors, the first was: ... to see all run again with `--verbose`"
 - [ ] Fix dependency tree order
   - It errored on a weird situation when utils failed after cli, but may have caused cli to not see utils anymore
+- [ ] When making local packages they should install into `~/.wool/packages/lsjroberts/example/1.0.0-dev`
+  - A package's version will be determined by its interface, therefore you have to write the code before you can version. However, this means it will compile into and overwrite the existing actual version you have downloaded / made. To prevent this it installs into the `-dev` suffix for the current version.
+  - Local packages that depend on `1.0.0` will use the `-dev` version
+  - Local packages that have a constraint that does not match `1.0.0` will not depend on this `-dev` version
+- [ ] Record package usage in `~/.wool/usage.json` and auto clean unused packages
+  - When a project is compiled, update the `usage.json` with which packages and versions it depends on
+  - If the compilation causes a package to have zero projects using it, delete that package/version
+- [ ] Restructure into:
+  ```
+  wool/core
+    Array
+    Dict
+    List
+    Maybe
+    Process
+    Set
+    String
+    Tuple
+  wool/cli
+  wool/fs
+  wool/package
+  wool/request
+  wool/semver
+  wool/terminal
+  wool/test
+  ```

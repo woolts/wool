@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "name": "wool/core-tests",
+  "entry": "all.ts",
+  "dependencies": {
+    "wool/core": "0.0.0 <= v < 1.0.0",
+    "wool/test": "0.0.0 <= v < 1.0.0"
+  }
+}
