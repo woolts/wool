@@ -7,13 +7,14 @@ type List<A> = Array<A>;
 
 const map = <A, B>(fn: (a: A) => B, as: List<A>): List<B> => as.map(a => fn(a));
 
-const indexedMap = <A, B>(fn: (a: A) => B, as: List<A>): List<B> => as.map(fn);
+const indexedMap = <A, B>(fn: (a: A, i: number) => B, as: List<A>): List<B> =>
+  as.map(fn);
 
 const foldl = <A, B>(fn: (char: A, b: B) => B, b: B, as: List<A>): B =>
-  as.reduce((previous, current) => fn(current, previous), b);
+  reverse(as).reduce((previous, current) => fn(current, previous), b);
 
 const foldr = <A, B>(fn: (char: A, b: B) => B, b: B, as: List<A>): B =>
-  reverse(as).reduce((previous, current) => fn(current, previous), b);
+  as.reduce((previous, current) => fn(current, previous), b);
 
 const filter = <A>(fn: (a: A) => Boolean, as: List<A>): List<A> =>
   as.filter(a => fn(a));

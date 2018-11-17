@@ -124,7 +124,7 @@ export default describe('Maybe', [
       given: 'a chain with a nothing',
       should: 'return nothing',
       actual: Maybe.andThen(
-        a => Maybe.andThen(a => Maybe.andThen(a => Maybe.nothing())),
+        a => Maybe.andThen(b => Maybe.andThen(c => Maybe.nothing(), b), a),
         Maybe.just('value'),
       ),
       expect: Maybe.nothing(),
@@ -135,7 +135,7 @@ export default describe('Maybe', [
       actual: Maybe.andThen(
         a =>
           Maybe.andThen(
-            a => Maybe.andThen(a => Maybe.just(`mapped:${a}`), a),
+            b => Maybe.andThen(c => Maybe.just(`mapped:${c}`), b),
             a,
           ),
         Maybe.just('value'),
