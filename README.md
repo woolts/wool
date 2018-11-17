@@ -2,6 +2,11 @@
 
 **This project is very early pre-alpha, not everything described here exists, and much of it will not work as expected.**
 
+- [Getting Started](#getting-started)
+- [Creating a New Project](#creating-a-new-project)
+- [CLI](#cli)
+- [Testing](#testing)
+
 Wool is a new typescript ecosystem designed for a great developer experience. Easy for beginners and scalable for advanced projects.
 
 It is a package manager, decentralised package registry, and monorepo compiler.
@@ -30,7 +35,7 @@ And you should see a list of the installed `wool/*` packages.
 
 Unless stated on a new release, to upgrade you should be able to simply clone this repo and run `wool make .` inside it. This will install the latest code within each package into `~/.wool/packages`.
 
-## Creating a new project
+## Creating a New Project
 
 In the future you will be able to do this by running `wool init`, but for now you can follow these instructions.
 
