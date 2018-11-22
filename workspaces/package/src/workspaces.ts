@@ -22,9 +22,10 @@ export interface ResolvedWorkspace {
 
 export const resolveWorkspaces = (
   dir: string,
+  parentVersion?: string,
 ): Promise<{ [key: string]: ResolvedWorkspace }> =>
   readPackageConfig(dir)
-    .then(config => resolveWorkspacesHelper(dir, config))
+    .then(config => resolveWorkspacesHelper(dir, config, parentVersion))
     .catch(err => {
       // console.log(errors.resolveWorkspaces(dir, err));
       throw new Error(err);
@@ -33,12 +34,13 @@ export const resolveWorkspaces = (
 const resolveWorkspacesHelper = async (
   dir: string,
   config: WoolConfig,
+  parentVersion?: string,
 ): Promise<{ [key: string]: ResolvedWorkspace }> => {
   let resolved = {};
 
   if (!config.workspaces) {
     const lock = await readPackageLock(dir);
-    const version = config.version || '0.0.0'; // parentVersion;
+    const version = config.version || parentVersion;
     return {
       [config.name]: {
         config,
@@ -52,7 +54,10 @@ const resolveWorkspacesHelper = async (
   for (let i = 0; i < config.workspaces.length; i++) {
     resolved = {
       ...resolved,
-      ...(await resolveWorkspaces(path.join(dir, config.workspaces[i]))),
+      ...(await resolveWorkspaces(
+        path.join(dir, config.workspaces[i]),
+        config.version || parentVersion,
+      )),
     };
   }
 

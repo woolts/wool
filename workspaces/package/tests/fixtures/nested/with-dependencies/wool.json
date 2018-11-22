@@ -1,0 +1,8 @@
+{
+  "name": "fixtures/nested-with-dependencies",
+  "dependencies": {
+    "direct": {
+      "fixtures/nested-with-version": "2.0.0 <= v < 3.0.0"
+    }
+  }
+}

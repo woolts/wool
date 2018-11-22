@@ -1,0 +1,4 @@
+{
+  "name": "fixtures/nested-without-version",
+  "entry": "index.ts"
+}

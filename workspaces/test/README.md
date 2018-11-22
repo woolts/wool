@@ -6,7 +6,9 @@ A testing library for [wool](https://github.com/woolts/wool).
 
 As [Eric Elliot discusses](https://medium.com/javascript-scene/rethinking-unit-test-assertions-55f59358253f), a testing library only requires a single assertion: equality.
 
-Usually, it is also only worthwhile testing the public API of a package. So we add the package under test as a dependency of our test suite.
+Often, it is also only worthwhile testing the public API of a package. So we add the package under test as a dependency of our test suite.
+
+_TODO: discuss co-locating them so you can test non-public functions_
 
 ### Fuzz Testing
 
