@@ -220,19 +220,31 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
       );
       // TODO: symlink binaries
     })
+    .then(() => {
+      stopSpinner(
+        () =>
+          `🐑 Compiled ${colors.cyan(name)} from ${colors.white(
+            dir.replace(`${process.cwd()}/`, ''),
+          )} into ${colors.magenta(
+            packageArtifactDir.replace(`${process.cwd()}/`, ''),
+          )}`,
+      );
+    })
     .catch(error => {
+      stopSpinner(
+        () =>
+          `❌ ${colors.red('Failed to compile')} ${colors.cyan(
+            name,
+          )} ${colors.red('from')} ${colors.white(
+            dir.replace(`${process.cwd()}/`, ''),
+          )} ${colors.red('into')} ${colors.magenta(
+            packageArtifactDir.replace(`${process.cwd()}/`, ''),
+          )}`,
+      );
+
       console.log('');
       console.log(error.message);
     });
-
-  stopSpinner(
-    () =>
-      `🐑 Compiled ${colors.cyan(name)} from ${colors.white(
-        dir.replace(`${process.cwd()}/`, ''),
-      )} into ${colors.magenta(
-        packageArtifactDir.replace(`${process.cwd()}/`, ''),
-      )}`,
-  );
 }
 
 async function tsconfigTemplate(
@@ -252,43 +264,44 @@ async function tsconfigTemplate(
     Object.keys(lock).map(async dep => {
       // TODO: it should only shortcut to local workspace if the constraint
       // matches the local version
-      if (workspaces && workspaces[dep]) {
-        paths[dep] = [
-          // ./lsjroberts/example
-          path.relative(
-            rootDir,
-            path.resolve(
-              rootDir,
-              workspaces[dep].dir,
-              workspaces[dep].config.entry,
-            ),
-          ),
-        ];
-        references.push({
-          path: path.relative(dir, workspaces[dep].dir),
-        });
-      } else {
-        const installedConfig = await readInstalledPackageConfig(
+      // if (workspaces && workspaces[dep]) {
+      //   paths[dep] = [
+      //     // ./lsjroberts/example
+      //     path.relative(
+      //       rootDir,
+      //       path.resolve(
+      //         rootDir,
+      //         workspaces[dep].dir,
+      //         workspaces[dep].config.entry,
+      //       ),
+      //     ),
+      //   ];
+      //   references.push({
+      //     path: path.relative(dir, workspaces[dep].dir),
+      //   });
+      // } else {
+      const installedConfig = await readInstalledPackageConfig(
+        dep,
+        lock[dep].version,
+      );
+      paths[dep] = [
+        // ~/.wool/packages/lsjroberts/example/1.0.0
+        // path.relative(
+        // rootDir,
+        path.join(
+          localPackagesPath,
           dep,
-          lock[dep].version,
-        );
-        paths[dep] = [
-          // ~/.wool/packages/lsjroberts/example/1.0.0
-          path.relative(
-            rootDir,
-            path.join(
-              localPackagesPath,
-              dep,
-              `${lock[dep].version}`,
-              installedConfig.entry.replace('.ts', '.js'),
-            ),
-          ),
-        ];
-      }
+          `${lock[dep].version}`,
+          installedConfig.entry.replace('.ts', '.js'),
+        ),
+        // ),
+      ];
+      // }
     }),
   );
 
-  const outDir = path.relative(dir, packageArtifactDir);
+  // const outDir = path.relative(dir, packageArtifactDir);
+  const outDir = packageArtifactDir;
 
   return {
     compilerOptions: {
@@ -298,6 +311,7 @@ async function tsconfigTemplate(
       moduleResolution: 'node',
       target: 'esnext',
       baseUrl: path.relative(dir, rootDir),
+      // baseUrl: '.',
       paths,
       typeRoots: [localPackagesPath.replace('packages', 'types')], // TODO: localTypesPath
       outDir,
@@ -325,7 +339,7 @@ function handleWorkspaceError(resolvedDir) {
 async function handleTypescriptCompileError(err) {
   const compileErrors = err.stdout.split('\n');
 
-  const formattedErrors = await Promise.all(
+  const formattedErrors = (await Promise.all(
     compileErrors.map(async compileError => {
       // https://regex101.com/r/tWRRQ3/1
       const cannotFindModuleMatch = compileError.match(
@@ -355,12 +369,14 @@ async function handleTypescriptCompileError(err) {
         });
       }
 
-      return err.stdout;
+      return '';
     }),
-  );
+  )).filter(Boolean);
 
   formattedErrors.push(
-    `There were ${formattedErrors.length - 1} compilation errors.`,
+    `There ${formattedErrors.length === 1 ? 'was' : 'were'} ${
+      formattedErrors.length
+    } compilation error${formattedErrors.length === 1 ? '' : 's'}.`,
   );
 
   throw new Error(formattedErrors.join('\n\n\n'));

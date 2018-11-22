@@ -197,14 +197,14 @@ function findMissingPackages(workspaces) {
   const indirect = mapValues(get('config.dependencies.indirect'), workspaces);
   const locks = mapValues(get('lock'), workspaces);
 
-  const getDependencies = map(keys);
-  const dependencies = unique(
-    flatten([getDependencies(direct), getDependencies(indirect)]),
-  );
-  const lockDependencies = unique(flatten(map(Object.keys, locks)));
+  // const getDependencies = map(keys);
+  // const dependencies = unique(
+  //   flatten([getDependencies(direct), getDependencies(indirect)]),
+  // );
+  // const lockDependencies = unique(flatten(map(Object.keys, locks)));
 
-  debug(dependencies);
-  debug(lockDependencies);
+  // debug(dependencies);
+  // debug(lockDependencies);
 }
 
 const debug = str => console.log(JSON.stringify(str, null, 2));
