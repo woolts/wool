@@ -97,25 +97,42 @@ async function makeTypescriptMissingModuleError({ filePath, line, pos, name }) {
 }
 
 async function makeTypescriptGenericError({ filePath, line, pos, message }) {
+  const lineNum = parseInt(line, 10);
   const fileContents = await readFile(path.join(process.cwd(), filePath)).then(
     buffer => buffer.toString(),
   );
-  const fileContentsLine = fileContents.split('\n')[line - 1];
+  const fileLines = fileContents.split('\n');
+  const fileContentsLine = fileLines[lineNum - 1];
   const remainder = fileContentsLine.slice(pos);
   const fileContentsPosLength =
-    // remainder.indexOf(' ') ||
-    remainder.indexOf("'");
-  // remainder.indexOf('\n') ||
-  // remainder.indexOf(';');
+    remainder.indexOf(' ') ||
+    remainder.indexOf("'") ||
+    remainder.indexOf('\n') ||
+    remainder.indexOf(';');
+
+  // TODO: this is awful
+  const above2 = fileLines[lineNum - 3];
+  const above1 = fileLines[lineNum - 2];
+  const below1 = fileLines[lineNum];
+  const below2 = fileLines[lineNum + 1];
+
+  // TODO: syntax highlighting
+  const lines = [
+    `${lineNum - 2}| ${above2}`,
+    `${lineNum - 1}| ${above1}`,
+    `${lineNum}| ${fileContentsLine}`,
+    `${format.repeat(
+      ' ',
+      String(lineNum).length + 1 + Number(pos),
+    )}${colors.red(format.repeat('^', 1))}`,
+    `${lineNum + 1}| ${below1}`,
+    `${lineNum + 2}| ${below2}`,
+  ].join('\n');
 
   return [
     format.title('Typescript error', filePath),
     format.message(message),
-    // TODO: syntax highlighting
-    `${line}| ${fileContentsLine}\n${format.repeat(
-      ' ',
-      String(line).length + 2 + Number(pos),
-    )}${colors.red(format.repeat('^', fileContentsPosLength))}`,
+    lines,
   ].join('\n\n');
 }
 

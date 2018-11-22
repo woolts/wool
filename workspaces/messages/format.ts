@@ -64,7 +64,9 @@ function message(string: string) {
 function table(rows: Array<Array<string>>) {
   const pad = padRight(' ');
 
-  const out = map(() => [], rows);
+  // TODO: fix map types
+  // const out = map(() => [], rows);
+  const out = rows.map(() => []);
 
   rows.forEach((columns, row) => {
     columns.forEach((value, column) => {
