@@ -1,0 +1,11 @@
+{
+  "name": "wool/package",
+  "entry": "index.ts",
+  "dependencies": {
+    "direct": {
+      "wool/messages": "0.0.0 <= v < 1.0.0",
+      "wool/utils": "0.0.0 <= v < 1.0.0"
+    },
+    "indirect": {}
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "workspaces": [
+    "src",
+    "tests"
+  ],
+  "tasks": {
+    "test": ["wool", "run-private", "wool/package-tests"]
+  }
+}

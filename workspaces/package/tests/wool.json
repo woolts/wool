@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "name": "wool/package-tests",
+  "entry": "all.ts",
+  "dependencies": {
+    "direct": {
+      "wool/package": "0.0.0 <= v < 1.0.0",
+      "wool/test": "0.0.0 <= v < 1.0.0"
+    },
+    "indirect": {
+      "wool/messages": "0.0.0 <= v < 1.0.0",
+      "wool/utils": "0.0.0 <= v < 1.0.0"
+    }
+  }
+}

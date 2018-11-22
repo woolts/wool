@@ -6,8 +6,18 @@ export interface Suite {
 export interface Assertion {
   given: string;
   should: string;
-  actual: Function;
+  actual: any;
   expected: any;
+}
+
+export default async function run(suite: Suite) {
+  console.log('TAP version 13');
+
+  assertionCount = 0;
+
+  await runSuite(suite);
+
+  console.log(`1..${assertionCount}`);
 }
 
 export function describe(
@@ -23,34 +33,50 @@ export function assert(assertion: Assertion) {
   return assertion;
 }
 
-export function attempt(fn: Function, ...args) {
-  try {
-    return fn(...args);
-  } catch (err) {
-    return err;
-  }
+export function attempt(fn: Function) {
+  return async () => {
+    try {
+      return await fn();
+    } catch (err) {
+      return err;
+    }
+  };
 }
 
-function runSuite(suite: Suite, parents?: Array<string>) {
+async function runSuite(suite: Suite, parents?: Array<string>) {
   if (suite.assertions.length === 0) return;
   if ((<Suite>suite.assertions[0]).assertions) {
-    (<Array<Suite>>suite.assertions).forEach((assertion: Suite) => {
-      runSuite(assertion, parents ? [...parents, suite.label] : [suite.label]);
-    });
+    await Promise.all(
+      (<Array<Suite>>suite.assertions).map(async (assertion: Suite) => {
+        await runSuite(
+          assertion,
+          parents ? [...parents, suite.label] : [suite.label],
+        );
+      }),
+    );
   } else {
     console.log(
       `# ${parents ? `${parents.join(' > ')} > ` : ''}${suite.label}`,
     );
-    (<Array<Assertion>>suite.assertions).forEach((assertion: Assertion) => {
-      runAssertion(assertion);
-    });
+    await Promise.all(
+      (<Array<Assertion>>suite.assertions).map(async (assertion: Assertion) => {
+        await runAssertion(assertion);
+      }),
+    );
   }
 }
 
-function runAssertion(assertion: Assertion) {
+async function runAssertion(assertion: Assertion) {
   assertionCount += 1;
 
-  const result = isEqual(assertion.actual, assertion.expected);
+  let actual;
+  if (typeof assertion.actual === 'function') {
+    actual = await assertion.actual();
+  } else {
+    actual = await assertion.actual;
+  }
+
+  const result = isEqual(actual, assertion.expected);
 
   if (result) {
     console.log(
@@ -66,39 +92,43 @@ function runAssertion(assertion: Assertion) {
     );
     console.log('  ---');
     console.log(`  expected: ${JSON.stringify(assertion.expected)}`);
-    console.log(`  received: ${JSON.stringify(assertion.actual)}`);
+    console.log(`  received: ${JSON.stringify(actual)}`);
     console.log('  ...');
   }
 }
 
-function isEqual(left, right) {
-  if (left === right) return true;
-  if (left instanceof Date && right instanceof Date) {
-    return left.getTime() === right.getTime();
+function isEqual(actual, expected) {
+  if (actual === expected) return true;
+  if (actual instanceof Date && expected instanceof Date) {
+    return actual.getTime() === expected.getTime();
   }
   if (
-    !left ||
-    !right ||
-    (typeof left !== 'object' && typeof right !== 'object')
+    !actual ||
+    !expected ||
+    (typeof actual !== 'object' && typeof expected !== 'object')
   ) {
-    return left !== left && right !== right;
+    return actual !== actual && expected !== expected;
   }
 
   // TODO: improve
-  if (Array.isArray(left) && Array.isArray(right)) {
-    for (const i in left) {
-      if (left[i] !== right[i]) return false;
+  if (Array.isArray(actual) && Array.isArray(expected)) {
+    for (const i in actual) {
+      if (actual[i] !== expected[i]) return false;
     }
     return true;
   }
-}
 
-export default function run(suite: Suite) {
-  console.log('TAP version 13');
-
-  assertionCount = 0;
-
-  runSuite(suite);
-
-  console.log(`1..${assertionCount}`);
+  if (typeof expected === 'object') {
+    if (typeof actual !== 'object') return false;
+    if (Object.keys(actual).length !== Object.keys(expected).length) {
+      return false;
+    }
+    for (const k in expected) {
+      if (!isEqual(actual[k], expected[k])) {
+        console.log(`'${k}' does not match`);
+        return false;
+      }
+    }
+    return true;
+  }
 }

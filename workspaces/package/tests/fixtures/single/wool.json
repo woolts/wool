@@ -1,0 +1,5 @@
+{
+  "name": "fixtures/single",
+  "version": "1.2.0",
+  "entry": "index.ts"
+}
