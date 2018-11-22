@@ -78,7 +78,7 @@ export default describe('List', [
     assert({
       given: 'an empty list',
       should: 'return an empty list',
-      actual: List.filter(a => a % 2 === 0, [], []),
+      actual: List.filter(a => a % 2 === 0, []),
       expected: [],
     }),
     assert({
