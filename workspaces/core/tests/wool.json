@@ -2,8 +2,13 @@
   "private": true,
   "name": "wool/core-tests",
   "entry": "all.ts",
+  "tasks": {
+    "test": ["wool", "run-private", "wool/core-tests"]
+  },
   "dependencies": {
-    "wool/core": "0.0.0 <= v < 1.0.0",
-    "wool/test": "0.0.0 <= v < 1.0.0"
+    "direct": {
+      "wool/core": "0.0.0 <= v < 1.0.0",
+      "wool/test": "0.0.0 <= v < 1.0.0"
+    }
   }
 }

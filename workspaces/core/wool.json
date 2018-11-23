@@ -3,8 +3,5 @@
   "workspaces": [
     "src",
     "tests"
-  ],
-  "tasks": {
-    "test": ["wool", "run-private", "wool/core-tests"]
-  }
+  ]
 }

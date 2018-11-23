@@ -2,6 +2,9 @@
   "private": true,
   "name": "wool/package-tests",
   "entry": "all.ts",
+  "tasks": {
+    "test": ["wool", "run-private", "wool/package-tests"]
+  },
   "dependencies": {
     "direct": {
       "wool/package": "0.0.0 <= v < 1.0.0",

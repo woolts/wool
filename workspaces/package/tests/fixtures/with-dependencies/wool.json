@@ -1,0 +1,13 @@
+{
+  "name": "fixtures/with-dependencies",
+  "version": "1.2.0",
+  "entry": "index.ts",
+  "dependencies": {
+    "direct": {
+      "fixtures/other": "1.0.0 <= v < 2.0.0"
+    },
+    "indirect": {
+      "fixtures/other-child": "1.0.0 <= v < 2.0.0"
+    }
+  }
+}

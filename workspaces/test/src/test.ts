@@ -1,6 +1,6 @@
 export interface Suite {
   label: string;
-  assertions: Array<Suite> | Array<Assertion>;
+  children: Array<Suite> | Array<Assertion>;
 }
 
 export interface Assertion {
@@ -22,9 +22,9 @@ export default async function run(suite: Suite) {
 
 export function describe(
   label: string,
-  assertions: Array<Suite> | Array<Assertion>,
+  children: Array<Suite> | Array<Assertion>,
 ) {
-  return { label, assertions };
+  return { label, children };
 }
 
 let assertionCount = 0;
@@ -44,24 +44,23 @@ export function attempt(fn: Function) {
 }
 
 async function runSuite(suite: Suite, parents?: Array<string>) {
-  if (suite.assertions.length === 0) return;
-  if ((<Suite>suite.assertions[0]).assertions) {
-    await Promise.all(
-      (<Array<Suite>>suite.assertions).map(async (assertion: Suite) => {
-        await runSuite(
-          assertion,
-          parents ? [...parents, suite.label] : [suite.label],
-        );
-      }),
+  if (suite.children.length === 0) return;
+  if ((<Suite>suite.children[0]).children) {
+    await (<Array<Suite>>suite.children).reduce(
+      (promise, child: Suite) =>
+        promise.then(() =>
+          runSuite(child, parents ? [...parents, suite.label] : [suite.label]),
+        ),
+      Promise.resolve(),
     );
   } else {
     console.log(
       `# ${parents ? `${parents.join(' > ')} > ` : ''}${suite.label}`,
     );
-    await Promise.all(
-      (<Array<Assertion>>suite.assertions).map(async (assertion: Assertion) => {
-        await runAssertion(assertion);
-      }),
+    await (<Array<Assertion>>suite.children).reduce(
+      (promise, assertion: Assertion) =>
+        promise.then(() => runAssertion(assertion)),
+      Promise.resolve(),
     );
   }
 }
@@ -97,6 +96,7 @@ async function runAssertion(assertion: Assertion) {
   }
 }
 
+// TODO: consider lifting this from lodash (with credit)
 function isEqual(actual, expected) {
   if (actual === expected) return true;
   if (actual instanceof Date && expected instanceof Date) {
@@ -117,6 +117,10 @@ function isEqual(actual, expected) {
     }
     return true;
   }
+
+  if (typeof actual !== typeof actual) return false;
+  if (expected instanceof Error && !(actual instanceof Error)) return false;
+  if (actual instanceof Error && !(expected instanceof Error)) return false;
 
   if (typeof expected === 'object') {
     if (typeof actual !== 'object') return false;
