@@ -9,6 +9,11 @@
     "direct": {
       "wool/core": "0.0.0 <= v < 1.0.0",
       "wool/test": "0.0.0 <= v < 1.0.0"
+    },
+    "indirect": {
+      "wool/colors": "0.0.0 <= v < 1.0.0",
+      "wool/messages": "0.0.0 <= v < 1.0.0",
+      "wool/utils": "0.0.0 <= v < 1.0.0"
     }
   }
 }

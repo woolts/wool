@@ -93,6 +93,12 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
       `${specifier}/${entryLock[specifier].version}/`,
       woolPackagesUrl,
     );
+  } else {
+    throw new Error(
+      `The package \`${specifier}\` has not been added to this project at \`${
+        process.env.WOOL_ENTRY
+      }\`, try running \`wool add ${specifier}\``,
+    );
   }
 
   // Try wool package resolution
@@ -112,15 +118,8 @@ export async function resolve(specifier, parentModuleUrl, defaultResolver) {
       format: 'esm',
     };
   } catch (err) {
-    console.log(
-      `\nCould not find wool module\n\n    ${specifier}\n    ${specifierUrl}\n\n`,
+    throw new Error(
+      `Could not find wool module \`${specifier}\` at \`${specifierUrl}\``,
     );
-    console.log(err);
-    console.log('\n');
-
-    trace(specifier, 'falling back to resolving with default resolver');
-
-    // Otherwise use default resolver
-    return defaultResolver(specifier, parentModuleUrl);
   }
 }

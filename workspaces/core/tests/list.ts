@@ -46,7 +46,7 @@ export default describe('List', [
       expected: 6,
     }),
     assert({
-      given: 'a list of numbers a concat',
+      given: 'a list of numbers and concat',
       should: 'reverse the list',
       actual: List.foldl((cur, prev) => [...prev, cur], [], [1, 2, 3]),
       expected: [3, 2, 1],
@@ -67,7 +67,7 @@ export default describe('List', [
       expected: 6,
     }),
     assert({
-      given: 'a list of numbers a concat',
+      given: 'a list of numbers and concat',
       should: 'maintain the order',
       actual: List.foldr((cur, prev) => [...prev, cur], [], [1, 2, 3]),
       expected: [1, 2, 3],
@@ -82,7 +82,7 @@ export default describe('List', [
       expected: [],
     }),
     assert({
-      given: 'a list of numbers an evens filter',
+      given: 'a list of numbers and an evens filter',
       should: 'return list of even numbers',
       actual: List.filter(a => a % 2 === 0, [1, 2, 3, 4]),
       expected: [2, 4],
