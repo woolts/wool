@@ -114,7 +114,14 @@ async function validate(pkg) {
 
 async function compile(workspaces, artifactsDir, args) {
   for (let name in workspaces) {
-    await makePackage(artifactsDir, workspaces, name, workspaces[name], args);
+    const success = await makePackage(
+      artifactsDir,
+      workspaces,
+      name,
+      workspaces[name],
+      args,
+    );
+    if (!success) break;
   }
 }
 
@@ -167,7 +174,7 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
   );
 
   // await exec(`tsc -p ${tsconfigPath} --traceResolution`).catch(result => {
-  await exec(`tsc -p ${tsconfigPath}`)
+  return exec(`tsc -p ${tsconfigPath}`)
     .catch(handleTypescriptCompileError)
     .then(async () => {
       // TODO: This is duplicating .js files to .mjs, in an ideal world we would
@@ -229,6 +236,8 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
             packageArtifactDir.replace(`${process.cwd()}/`, ''),
           )}`,
       );
+
+      return true;
     })
     .catch(error => {
       stopSpinner(
@@ -244,6 +253,8 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
 
       console.log('');
       console.log(error.message);
+
+      return false;
     });
 }
 
@@ -309,6 +320,7 @@ async function tsconfigTemplate(
       composite: true,
       module: 'esnext',
       moduleResolution: 'node',
+      // lib: ['esnext'], // TODO: why did I add this? it breaks on `URL` not found
       target: 'esnext',
       baseUrl: path.relative(dir, rootDir),
       // baseUrl: '.',

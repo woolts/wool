@@ -75,3 +75,4 @@
 - [ ] Extract cli commands into programattic actions which the cli calls and provides a terminal interface to
 - [ ] Fix intermittent make failures. It fails on types but running again it passes.
 - [ ] Add test failure reporter for object diffs
+- [ ] Fix constant rebuild of private packages (not checking for dirty correctly)
