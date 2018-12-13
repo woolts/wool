@@ -331,7 +331,7 @@ type Property = string;
 
 // @private
 function createPredicate<X>(predicate: Predicate<X>): (x: X) => boolean {
-  if (typeof predicate === 'function') return predicate;
+  if (typeof predicate === 'function') return predicate as PredicateFn<X>;
 
   if (typeof predicate === 'object') {
     return (x: X) => {
