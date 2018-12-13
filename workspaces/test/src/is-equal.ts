@@ -38,6 +38,7 @@ export default function isEqual(actual, expected) {
 
 function isEqualArrays(actual, expected) {
   if (actual.length === 0 && expected.length === 0) return true;
+  if (actual.length !== expected.length) return false;
 
   for (const i in actual) {
     if (!isEqual(actual[i], expected[i])) return false;

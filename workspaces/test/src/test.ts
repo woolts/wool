@@ -2,6 +2,8 @@ import { List, String } from 'wool/core';
 
 import isEqual from './is-equal';
 
+export { isEqual };
+
 export interface Suite {
   label: string;
   children: Array<Suite> | Array<Assertion>;

@@ -1,0 +1,9 @@
+{
+  "name": "wool/test",
+  "entry": "test.ts",
+  "dependencies": {
+    "direct": {
+      "wool/core": "0.0.0 <= v < 1.0.0"
+    }
+  }
+}
