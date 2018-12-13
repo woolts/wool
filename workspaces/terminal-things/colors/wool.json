@@ -1,0 +1,5 @@
+{
+  "name": "wool/colors",
+  "entry": "index.ts",
+  "dependencies": {}
+}
