@@ -1,3 +1,7 @@
+import { List, String } from 'wool/core';
+
+import isEqual from './is-equal';
+
 export interface Suite {
   label: string;
   children: Array<Suite> | Array<Assertion>;
@@ -70,7 +74,11 @@ async function runAssertion(assertion: Assertion) {
 
   let actual;
   if (typeof assertion.actual === 'function') {
-    actual = await assertion.actual();
+    try {
+      actual = await assertion.actual();
+    } catch (err) {
+      actual = err;
+    }
   } else {
     actual = await assertion.actual;
   }
@@ -90,49 +98,34 @@ async function runAssertion(assertion: Assertion) {
       }`,
     );
     console.log('  ---');
+    // if (typeof actual === 'object' && typeof assertion.expected === 'object') {
+    // logObjectDiff(actual, assertion.expected);
+    // } else {
     console.log(`  expected: ${JSON.stringify(assertion.expected)}`);
     console.log(`  received: ${JSON.stringify(actual)}`);
+    // }
     console.log('  ...');
   }
 }
 
-// TODO: consider lifting this from lodash (with credit)
-function isEqual(actual, expected) {
-  if (actual === expected) return true;
-  if (actual instanceof Date && expected instanceof Date) {
-    return actual.getTime() === expected.getTime();
-  }
+function logObjectDiff(actual, expected) {
+  const missing = List.sort(
+    List.difference(Object.keys(expected), Object.keys(actual)),
+  );
+  const extra = List.sort(
+    List.difference(Object.keys(actual), Object.keys(expected)),
+  );
+  const values = List.filter((value, key) => actual[key] !== value, expected);
+
   if (
-    !actual ||
-    !expected ||
-    (typeof actual !== 'object' && typeof expected !== 'object')
+    List.length(missing) === 0 &&
+    List.length(extra) === 0 &&
+    List.length(values) === 0
   ) {
-    return actual !== actual && expected !== expected;
+    return;
   }
 
-  // TODO: improve
-  if (Array.isArray(actual) && Array.isArray(expected)) {
-    for (const i in actual) {
-      if (actual[i] !== expected[i]) return false;
-    }
-    return true;
-  }
-
-  if (typeof actual !== typeof actual) return false;
-  if (expected instanceof Error && !(actual instanceof Error)) return false;
-  if (actual instanceof Error && !(expected instanceof Error)) return false;
-
-  if (typeof expected === 'object') {
-    if (typeof actual !== 'object') return false;
-    if (Object.keys(actual).length !== Object.keys(expected).length) {
-      return false;
-    }
-    for (const k in expected) {
-      if (!isEqual(actual[k], expected[k])) {
-        console.log(`'${k}' does not match`);
-        return false;
-      }
-    }
-    return true;
-  }
+  console.log(List.foldr(String.append, '', missing));
+  console.log(List.foldr(String.append, '', extra));
+  // console.log(List.foldr(String.append, '', List.map((v) => extra)));
 }
