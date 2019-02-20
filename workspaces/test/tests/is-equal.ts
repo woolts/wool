@@ -64,6 +64,12 @@ export default describe('test', [
       expected: false,
     }),
     assert({
+      given: '{} == {}',
+      should: 'return true',
+      actual: isEqual({}, {}),
+      expected: true,
+    }),
+    assert({
       given: '{a:1} == {a:1}',
       should: 'return true',
       actual: isEqual({ a: 1 }, { a: 1 }),

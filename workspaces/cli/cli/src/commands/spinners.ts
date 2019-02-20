@@ -4,7 +4,9 @@ import { padRight } from 'wool/utils';
 // TODO: spinners should be on the stderr, used for messaging not output
 
 // https://github.com/sindresorhus/cli-spinners/blob/master/spinners.json
-const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+// const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+// const frames = ['☱', '☲', '☴'];
+const frames = ['⠋⠴', '⠙⠦', '⠹⠧', '⠸⠇', '⠼⠏', '⠴⠋', '⠦⠙', '⠧⠹', '⠇⠸', '⠏⠼'];
 
 let singletonInterval;
 let singletonTimeout;

@@ -4,10 +4,10 @@
   "entry": "index.ts",
   "dependencies": {
     "direct": {
-      "fixtures/other": "1.0.0 <= v < 2.0.0"
+      "other/hello": "1.0.0 <= v < 2.0.0"
     },
     "indirect": {
-      "fixtures/other-child": "1.0.0 <= v < 2.0.0"
+      "other/hello-child": "1.0.0 <= v < 2.0.0"
     }
   }
 }

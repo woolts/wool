@@ -96,6 +96,18 @@ const foldr = <C, A, B>(
     toList(dict),
   );
 
+// filter
+
+const partition = <C, A>(
+  fn: (k: C, v: A) => Boolean,
+  dict: Dict<C, A>,
+): Tuple<Dict<C, A>, Dict<C, A>> => T.pair(empty(), empty());
+// T.mapBoth(
+//   fromList,
+//   fromList,
+//   L.partition(([k, v]) => fn(k, v), toList(dict)),
+// );
+
 // ---
 
 export default {
@@ -116,7 +128,7 @@ export default {
   foldl,
   foldr,
   // filter,
-  // partition,
+  partition,
   // union,
   // intersect,
   // diff,

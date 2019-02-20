@@ -49,13 +49,13 @@ export default describe('config', [
       should: 'return the package lock',
       actual: () => readPackageLock(withDependencies),
       expected: {
-        'fixtures/other': {
+        'other/hello': {
           version: '1.3.6',
           constraint: '1.0.0 <= v < 2.0.0',
           registry: 'https://registry.wool.org',
           size: 12345,
         },
-        'fixtures/other-child': {
+        'other/hello-child': {
           version: '1.23.45',
           constraint: '1.0.0 <= v < 2.0.0',
           registry: 'https://registry.wool.org',

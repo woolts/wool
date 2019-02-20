@@ -4,6 +4,13 @@
   "registries": [
     "http://localhost:7777"
   ],
+  "tasks": {
+    "test": {
+      "core": ["wool", "run-private", "wool/core-tests"],
+      "package": ["wool", "run-private", "wool/core-tests"],
+      "test": ["wool", "run-private", "wool/test-tests"]
+    }
+  },
   "workspaces": [
     "workspaces/cli",
     "workspaces/core",
@@ -14,6 +21,7 @@
     "workspaces/process",
     "workspaces/request",
     "workspaces/semver",
+    "workspaces/terminal",
     "workspaces/test",
     "workspaces/utils"
   ]

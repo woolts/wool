@@ -208,6 +208,8 @@ export async function getWorkspaceDependencyTree(workspaces: {
     Object.values(workspaces),
   );
 
+  // console.log(JSON.stringify({ workspaces, withoutDeps, withDeps }, null, 2));
+
   let resolved = [].concat(withoutDeps);
   let next = [].concat(withDeps);
   let looped = [];
@@ -244,6 +246,8 @@ export async function getWorkspaceDependencyTree(workspaces: {
       next = nextAttempt;
     }
   }
+
+  // console.log({ resolved, looped });
 
   return { tree: resolved, looped };
 }

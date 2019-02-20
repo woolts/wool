@@ -61,7 +61,7 @@ async function runSuite(suite: Suite, parents?: Array<string>) {
     );
   } else {
     console.log(
-      `# ${parents ? `${parents.join(' > ')} > ` : ''}${suite.label}`,
+      `# ${parents ? `${String.join(' ↠ ', parents)} ↠ ` : ''}${suite.label}`,
     );
     await (<Array<Assertion>>suite.children).reduce(
       (promise, assertion: Assertion) =>
@@ -101,10 +101,21 @@ async function runAssertion(assertion: Assertion) {
     );
     console.log('  ---');
     // if (typeof actual === 'object' && typeof assertion.expected === 'object') {
-    // logObjectDiff(actual, assertion.expected);
+    //   logObjectDiff(actual, assertion.expected);
     // } else {
-    console.log(`  expected: ${JSON.stringify(assertion.expected)}`);
-    console.log(`  received: ${JSON.stringify(actual)}`);
+    if (assertion.expected instanceof Map) {
+      console.log(`  expected: ${JSON.stringify([...assertion.expected])}`);
+    } else {
+      console.log(`  expected: ${JSON.stringify(assertion.expected)}`);
+    }
+
+    if (actual instanceof Error) {
+      console.log(`  received: Error – ${actual.message}`);
+    } else if (actual instanceof Map) {
+      console.log(`  received: ${JSON.stringify([...actual])}`);
+    } else {
+      console.log(`  received: ${JSON.stringify(actual)}`);
+    }
     // }
     console.log('  ...');
   }
@@ -117,7 +128,10 @@ function logObjectDiff(actual, expected) {
   const extra = List.sort(
     List.difference(Object.keys(actual), Object.keys(expected)),
   );
-  const values = List.filter((value, key) => actual[key] !== value, expected);
+  const values = List.filter(
+    key => actual[key] !== expected[key],
+    Object.keys(expected),
+  );
 
   if (
     List.length(missing) === 0 &&
@@ -127,7 +141,20 @@ function logObjectDiff(actual, expected) {
     return;
   }
 
-  console.log(List.foldr(String.append, '', missing));
-  console.log(List.foldr(String.append, '', extra));
+  console.log(
+    `  expected: {${String.join(
+      ', ',
+      List.map(key => `${key}: ${expected[key]}`, values),
+    )}}`,
+  );
+  console.log(
+    `  received: {${String.join(
+      ', ',
+      List.map(key => `${key}: ${actual[key]}`, values),
+    )}}`,
+  );
+
+  // console.log(List.foldr(String.append, '', missing));
+  // console.log(List.foldr(String.append, '', extra));
   // console.log(List.foldr(String.append, '', List.map((v) => extra)));
 }
