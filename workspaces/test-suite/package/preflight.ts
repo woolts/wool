@@ -6,7 +6,7 @@ import * as path from 'path';
 const single = path.join(
   // TODO: this should work
   // path.dirname(new URL(import.meta.url).pathname),
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/single',
 );
 
@@ -30,7 +30,7 @@ export default describe('preflight', [
             entry: 'index.ts',
             dependencies: { direct: {}, indirect: {} },
           },
-          dir: 'workspaces/package/tests/fixtures/single',
+          dir: 'workspaces/test-suite/package/fixtures/single',
           lock: {},
           version: '1.2.0',
         },

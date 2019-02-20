@@ -5,11 +5,7 @@
     "http://localhost:7777"
   ],
   "tasks": {
-    "test": {
-      "core": ["wool", "run-private", "wool/core-tests"],
-      "package": ["wool", "run-private", "wool/core-tests"],
-      "test": ["wool", "run-private", "wool/test-tests"]
-    }
+    "test": ["wool", "run-private", "wool/test-suite"]
   },
   "workspaces": [
     "workspaces/cli",
@@ -23,6 +19,7 @@
     "workspaces/semver",
     "workspaces/terminal",
     "workspaces/test",
+    "workspaces/test-suite",
     "workspaces/utils"
   ]
 }

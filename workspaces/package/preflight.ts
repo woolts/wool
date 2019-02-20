@@ -56,6 +56,8 @@ export default function preflight(
       );
     }
 
+    // TODO: check dependencies
+
     return Tuple.pair(workspace, 'ok');
   }, Dict.toList(workspaces));
 }

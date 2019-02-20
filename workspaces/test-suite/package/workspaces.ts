@@ -6,13 +6,16 @@ import * as path from 'path';
 const single = path.join(
   // TODO: this should work
   // path.dirname(new URL(import.meta.url).pathname),
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/single',
 );
 
-const nested = path.join('./workspaces/package/tests', './fixtures/nested');
+const nested = path.join(
+  './workspaces/test-suite/package',
+  './fixtures/nested',
+);
 const withDependencies = path.join(
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/with-dependencies',
 );
 

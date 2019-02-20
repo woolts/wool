@@ -18,6 +18,8 @@ interface CommandConfig {
   action: (cmd: Command) => void;
 }
 
+type ActionFn = () => void;
+
 interface ArgConfig {
   name: string;
   required: boolean;
@@ -29,6 +31,10 @@ interface FlagConfig {
 
 interface Command {
   [key: string]: boolean | string | number | null;
+}
+
+export function action(fn: ActionFn) {
+  return () => fn();
 }
 
 export function command(config: CommandConfig) {

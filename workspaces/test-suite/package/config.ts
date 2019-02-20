@@ -5,21 +5,21 @@ import * as path from 'path';
 const single = path.join(
   // TODO: this should work
   // path.dirname(new URL(import.meta.url).pathname),
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/single',
 );
 
 const invalid = path.join(
   // TODO: this should work
   // path.dirname(new URL(import.meta.url).pathname),
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/invalid',
 );
 
 const withDependencies = path.join(
   // TODO: this should work
   // path.dirname(new URL(import.meta.url).pathname),
-  './workspaces/package/tests',
+  './workspaces/test-suite/package',
   './fixtures/with-dependencies',
 );
 

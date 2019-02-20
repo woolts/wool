@@ -6,12 +6,10 @@ import maybe from './maybe';
 import string from './string';
 // import type from './type';
 
-run(
-  describe('core', [
-    dict,
-    list,
-    maybe,
-    string,
-    // type
-  ]),
-);
+export default describe('core', [
+  dict,
+  list,
+  maybe,
+  string,
+  // type
+]);
