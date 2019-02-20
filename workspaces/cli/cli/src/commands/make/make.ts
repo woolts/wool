@@ -93,7 +93,11 @@ async function prepare(workspaces, artifactsDir) {
 
     const { compiledAt } = await readPackageConfig(
       pathToUrl(
-        path.join(artifactsDir, workspace.config.name, workspace.version),
+        path.join(
+          artifactsDir,
+          workspace.config.name,
+          workspace.config.private ? '' : workspace.version,
+        ),
       ),
     ).catch(() => ({ compiledAt: 9999999999 }));
 
@@ -252,7 +256,7 @@ async function makePackage(artifactsDir, workspaces, name, pkg, args) {
       );
 
       console.log('');
-      console.log(error.message);
+      console.log(error.message ? error.message : error);
 
       return false;
     });
@@ -381,7 +385,7 @@ async function handleTypescriptCompileError(err) {
         });
       }
 
-      return '';
+      return compileError;
     }),
   )).filter(Boolean);
 
