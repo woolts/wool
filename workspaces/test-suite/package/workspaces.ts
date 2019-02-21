@@ -30,14 +30,11 @@ export default describe('workspaces', [
           name: 'fixtures/single',
           version: '1.2.0',
           entry: 'index.ts',
-          dependencies: {
-            direct: {},
-            indirect: {},
-          },
+          dependencies: { direct: {}, indirect: {} },
         },
-        dir: 'workspaces/package/tests/fixtures/single',
-        version: '1.2.0',
+        dir: 'workspaces/test-suite/package/fixtures/single',
         lock: {},
+        version: '1.2.0',
       }),
     }),
     assert({
@@ -54,7 +51,7 @@ export default describe('workspaces', [
               entry: 'index.ts',
               dependencies: { direct: {}, indirect: {} },
             },
-            dir: 'workspaces/package/tests/fixtures/nested/with-version',
+            dir: 'workspaces/test-suite/package/fixtures/nested/with-version',
             lock: {},
             version: '2.0.0',
           },
@@ -67,7 +64,8 @@ export default describe('workspaces', [
               entry: 'index.ts',
               dependencies: { direct: {}, indirect: {} },
             },
-            dir: 'workspaces/package/tests/fixtures/nested/without-version',
+            dir:
+              'workspaces/test-suite/package/fixtures/nested/without-version',
             lock: {},
             version: '1.0.0',
           },
@@ -84,7 +82,8 @@ export default describe('workspaces', [
                 indirect: {},
               },
             },
-            dir: 'workspaces/package/tests/fixtures/nested/with-dependencies',
+            dir:
+              'workspaces/test-suite/package/fixtures/nested/with-dependencies',
             lock: {},
             version: '1.0.0',
           },
@@ -108,7 +107,7 @@ export default describe('workspaces', [
                 indirect: { 'other/hello-child': '1.0.0 <= v < 2.0.0' },
               },
             },
-            dir: 'workspaces/package/tests/fixtures/with-dependencies',
+            dir: 'workspaces/test-suite/package/fixtures/with-dependencies',
             lock: {
               'other/hello': {
                 version: '1.3.6',
