@@ -22,11 +22,13 @@ type ActionFn = () => void;
 
 interface ArgConfig {
   name: string;
-  required: boolean;
+  required?: boolean;
 }
 
 interface FlagConfig {
   name: string;
+  type?: 'boolean' | 'string' | 'number';
+  required?: boolean;
 }
 
 interface Command {
@@ -38,8 +40,8 @@ export function action(fn: ActionFn) {
 }
 
 export function command(config: CommandConfig) {
-  return () => {
-    const cmd = parseArgv(process.argv);
+  return proc => {
+    const cmd = parseArgv(config.args, config.flags, proc.argv.slice(2));
     return config.action(cmd);
   };
 }
@@ -68,30 +70,41 @@ arg
 
 */
 
-function parseArgv(argv: Array<string>): Dict<string, any> {
+// TODO: Regex this :(
+function parseArgv(
+  args: Array<ArgConfig>,
+  flags: Array<FlagConfig>,
+  argv: Array<string>,
+): Dict<string, any> {
   return Dict.fromList(
-    List.reduce(
-      (as, word) => {
-        return [...as, ...parseWord(word)];
+    List.foldr(
+      (cur, prev) => {
+        return [...prev, parseWord({ cur, prev, args, flags })];
       },
-      argv,
       [],
+      argv,
     ),
   );
 }
 
-function parseWord(word: string): Tuple.Tuple<string, string> {
-  if (String.startsWith('--', word) && String.contains('=', word)) {
+function parseWord({
+  cur,
+  prev,
+  args,
+  flags,
+}: any): Tuple.Tuple<string, string> {
+  if (String.startsWith('--', cur) && String.contains('=', cur)) {
     // TODO: handle `--flag=hello=boo`
-    return Tuple.pair(...String.split('=', String.tail(2, word)));
+    let [name, value] = String.split('=', String.dropLeft(2, cur));
+    return Tuple.pair(name, trimQuotes(value));
   }
 
-  if (String.startsWith('--', word)) {
-    return Tuple.pair(String.tail(2, word), true);
+  if (String.startsWith('--', cur)) {
+    return Tuple.pair(String.dropLeft(2, cur), true);
   }
 
-  if (String.startsWith('-', word)) {
-    return Tuple.pair(String.tail(1, word), true);
+  if (String.startsWith('-', cur)) {
+    return Tuple.pair(String.dropLeft(1, cur), true);
   }
 
   // TODO: handle non-located flags
@@ -101,5 +114,10 @@ function parseWord(word: string): Tuple.Tuple<string, string> {
   // TODO: handle non-located args
   // ['arg', 'hello']
 
-  return Tuple.pair(word, true);
+  return Tuple.pair(cur, true);
 }
+
+const trimQuotes = str =>
+  String.startsWith('"', str) && String.endsWith('"', str)
+    ? String.dropLeft(1, String.dropRight(1, str))
+    : str;

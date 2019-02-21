@@ -21,6 +21,12 @@ export default function isEqual(actual, expected) {
   if (expected instanceof Error && !(actual instanceof Error)) return false;
   if (actual instanceof Error && !(expected instanceof Error)) return false;
 
+  if (expected instanceof Map) {
+    if (!(actual instanceof Map)) return false;
+    // TODO: improve
+    return JSON.stringify([...expected]) === JSON.stringify([...actual]);
+  }
+
   if (typeof expected === 'object') {
     if (typeof actual !== 'object') return false;
     if (Object.keys(actual).length !== Object.keys(expected).length) {

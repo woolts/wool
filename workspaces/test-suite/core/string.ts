@@ -76,4 +76,20 @@ export default describe('String', [
       expected: 'abcabcabc',
     }),
   ]),
+  describe('String.dropLeft', [
+    assert({
+      given: 'a string',
+      should: 'return the string without the left chars',
+      actual: String.dropLeft(2, 'abcdef'),
+      expected: 'cdef',
+    }),
+  ]),
+  describe('String.dropRight', [
+    assert({
+      given: 'a string',
+      should: 'return the string without the right chars',
+      actual: String.dropRight(2, 'abcdef'),
+      expected: 'abcd',
+    }),
+  ]),
 ]);

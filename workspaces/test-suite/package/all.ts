@@ -4,4 +4,4 @@ import config from './config';
 import preflight from './preflight';
 import workspaces from './workspaces';
 
-export default describe('core', [config, preflight, workspaces]);
+export default describe('package', [config, preflight, workspaces]);

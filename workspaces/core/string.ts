@@ -40,7 +40,8 @@ const right = (n: number, str: string): string => slice(0, -n, str);
 
 const dropLeft = (n: number, str: string): string => slice(n, length(str), str);
 
-const dropRight = (n: number, str: string): string => slice(0, n, str);
+const dropRight = (n: number, str: string): string =>
+  slice(0, length(str) - n, str);
 
 const contains = (search: string, str: string): Boolean => str.includes(search);
 
