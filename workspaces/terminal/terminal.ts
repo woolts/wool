@@ -36,12 +36,36 @@ interface Command {
 }
 
 export function action(fn: ActionFn) {
-  return () => fn();
+  return command({
+    action: cmd => {
+      fn();
+    },
+  });
 }
 
 export function command(config: CommandConfig) {
   return proc => {
-    const cmd = parseArgv(config.args, config.flags, proc.argv.slice(2));
+    const cmd = parseArgv(
+      config.args,
+      (config.flags || []).concat([
+        { name: 'help', type: 'boolean' },
+        { name: 'version', type: 'boolean' },
+      ]),
+      proc.argv,
+    );
+
+    if (cmd.help) {
+      console.log('help...');
+      // return layout([], column([], [el([], text`${woolConfig.name}`)]));
+      return;
+    }
+
+    if (cmd.version) {
+      console.log('version...');
+      // return layout([], el([], text`${woolConfig.version}`)]);
+      return;
+    }
+
     return config.action(cmd);
   };
 }
@@ -82,7 +106,7 @@ function parseArgv(
         return [...prev, parseWord({ cur, prev, args, flags })];
       },
       [],
-      argv,
+      argv.slice(2), // TODO: handle `ENV_VAR=foo program command --flag`
     ),
   );
 }

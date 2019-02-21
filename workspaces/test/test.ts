@@ -110,7 +110,7 @@ async function runAssertion(assertion: Assertion) {
     }
 
     if (actual instanceof Error) {
-      console.log(`  received: Error – ${actual.message}`);
+      console.log(`  received: Error – ${actual.stack || actual.message}`);
     } else if (actual instanceof Map) {
       console.log(`  received: ${JSON.stringify([...actual])}`);
     } else {
